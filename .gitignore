@@ -39,7 +39,7 @@
 
 # Executables
 bin
-bin-int
+obj
 *.out
 *.app
 

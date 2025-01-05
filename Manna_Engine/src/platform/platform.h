@@ -1,11 +1,10 @@
 #pragma once
-
 #ifdef MN_PLATFORM_WINDOWS
-	#ifdef MN_BUILD_DLL
+	#ifdef MN_DLL_EXPORT
 		#define MANNA_API __declspec(dllexport)
 	#else
 		#define MANNA_API __declspec(dllimport)
-	#endif // MN_BUILD_DLL
+	#endif
 #else
-	#error Unsupported Platform
-#endif // MN_PLATFORM_WINDOWS
+	#define MANNA_API
+#endif

@@ -15,27 +15,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3072A70D-9C86-CFBE-6508-731ED1DBCBEF}</ProjectGuid>
+    <ProjectGuid>{96BD0822-8220-98C6-2BA6-D07C17E86349}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Manna</RootNamespace>
+    <RootNamespace>Manna_Editor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
@@ -55,31 +55,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\bin\Debug-windows-x86_64\Manna\</OutDir>
-    <IntDir>..\bin-int\Debug-windows-x86_64\Manna\</IntDir>
-    <TargetName>Manna</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <OutDir>..\bin\Debug-windows-x86_64\Manna_Editor\</OutDir>
+    <IntDir>..\obj\Debug-windows-x86_64\Manna_Editor\</IntDir>
+    <TargetName>Manna_Editor</TargetName>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\Release-windows-x86_64\Manna\</OutDir>
-    <IntDir>..\bin-int\Release-windows-x86_64\Manna\</IntDir>
-    <TargetName>Manna</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <OutDir>..\bin\Release-windows-x86_64\Manna_Editor\</OutDir>
+    <IntDir>..\obj\Release-windows-x86_64\Manna_Editor\</IntDir>
+    <TargetName>Manna_Editor</TargetName>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\bin\Dist-windows-x86_64\Manna\</OutDir>
-    <IntDir>..\bin-int\Dist-windows-x86_64\Manna\</IntDir>
-    <TargetName>Manna</TargetName>
-    <TargetExt>.dll</TargetExt>
+    <OutDir>..\bin\Dist-windows-x86_64\Manna_Editor\</OutDir>
+    <IntDir>..\obj\Dist-windows-x86_64\Manna_Editor\</IntDir>
+    <TargetName>Manna_Editor</TargetName>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_BUILD_DLL;MN_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Manna_Engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -87,46 +87,43 @@
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>..\bin\Debug-windows-x86_64\Manna\Manna.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Debug-windows-x86_64\Manna\Manna.dll\ (xcopy /Q /E /Y /I ..\bin\Debug-windows-x86_64\Manna\Manna.dll ..\bin\Debug-windows-x86_64\sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Debug-windows-x86_64\Manna\Manna.dll ..\bin\Debug-windows-x86_64\sandbox &gt; nul)</Command>
+      <Command>IF EXIST $(SolutionDir)bin\Debug-windows-x86_64\Manna_engine\Manna_Engine.dll\ (xcopy /Q /E /Y /I $(SolutionDir)bin\Debug-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Debug-windows-x86_64\Manna_Editor &gt; nul) ELSE (xcopy /Q /Y /I $(SolutionDir)bin\Debug-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Debug-windows-x86_64\Manna_Editor &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_BUILD_DLL;MN_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Manna_Engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>/MT %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>..\bin\Release-windows-x86_64\Manna\Manna.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Release-windows-x86_64\Manna\Manna.dll\ (xcopy /Q /E /Y /I ..\bin\Release-windows-x86_64\Manna\Manna.dll ..\bin\Release-windows-x86_64\sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Release-windows-x86_64\Manna\Manna.dll ..\bin\Release-windows-x86_64\sandbox &gt; nul)</Command>
+      <Command>IF EXIST $(SolutionDir)bin\Release-windows-x86_64\Manna_engine\Manna_Engine.dll\ (xcopy /Q /E /Y /I $(SolutionDir)bin\Release-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Release-windows-x86_64\Manna_Editor &gt; nul) ELSE (xcopy /Q /Y /I $(SolutionDir)bin\Release-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Release-windows-x86_64\Manna_Editor &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_BUILD_DLL;MN_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MN_PLATFORM_WINDOWS;MN_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Manna_Engine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -137,25 +134,21 @@
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ImportLibrary>..\bin\Dist-windows-x86_64\Manna\Manna.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>IF EXIST ..\bin\Dist-windows-x86_64\Manna\Manna.dll\ (xcopy /Q /E /Y /I ..\bin\Dist-windows-x86_64\Manna\Manna.dll ..\bin\Dist-windows-x86_64\sandbox &gt; nul) ELSE (xcopy /Q /Y /I ..\bin\Dist-windows-x86_64\Manna\Manna.dll ..\bin\Dist-windows-x86_64\sandbox &gt; nul)</Command>
+      <Command>IF EXIST $(SolutionDir)bin\Dist-windows-x86_64\Manna_engine\Manna_Engine.dll\ (xcopy /Q /E /Y /I $(SolutionDir)bin\Dist-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Dist-windows-x86_64\Manna_Editor &gt; nul) ELSE (xcopy /Q /Y /I $(SolutionDir)bin\Dist-windows-x86_64\Manna_engine\Manna_Engine.dll ..\bin\Dist-windows-x86_64\Manna_Editor &gt; nul)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Manna.h" />
-    <ClInclude Include="src\Manna\Application.h" />
-    <ClInclude Include="src\Manna\Core.h" />
-    <ClInclude Include="src\Manna\EntryPoint.h" />
-    <ClInclude Include="src\Test.h" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Manna\Application.cpp" />
-    <ClCompile Include="src\Test.cpp" />
+    <ProjectReference Include="..\Manna_Engine\Manna_Engine.vcxproj">
+      <Project>{E56ABC22-D1CD-4BC7-7A53-847D6695174A}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
