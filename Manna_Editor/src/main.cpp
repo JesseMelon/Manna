@@ -1,6 +1,16 @@
 #include <manna.h>
 
 int main() {
-	test();
+	//test();
+
+	M_FATAL("Fatal! %f:", 1.0);
+	M_ERROR("Error!");
+	M_WARN("Warn!");
+	M_DEBUG("Debug!");
+	M_INFO("Info!");
+	M_TRACE("Trace!");
+
+	M_ASSERT(FALSE, "Assert!");
+
 	return 0;
 }

@@ -1,4 +1,4 @@
 #pragma once
-#include "../src/platform/platform.h"
-
-MANNA_API void test();
+#include "../src/core/test.h"
+#include "../src/core/logger.h"
+#include "../src/core/asserts.h"

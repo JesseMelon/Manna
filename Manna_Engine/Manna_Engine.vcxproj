@@ -139,10 +139,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\manna.h" />
+    <ClInclude Include="src\core\asserts.h" />
+    <ClInclude Include="src\core\logger.h" />
+    <ClInclude Include="src\core\test.h" />
     <ClInclude Include="src\defines.h" />
     <ClInclude Include="src\platform\platform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\logger.cpp" />
     <ClCompile Include="src\core\test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

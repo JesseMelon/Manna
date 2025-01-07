@@ -16,6 +16,9 @@ typedef double f64;
 typedef int b32;
 typedef char b8;
 
+#define TRUE 1
+#define FALSE 0
+
 #if defined(__clang__) || defined(__gcc__)
 	#define STATIC_ASSERT _Static_assert
 #else
@@ -33,3 +36,14 @@ STATIC_ASSERT(sizeof(i32) == 4, "i32 must be 4 bytes");
 STATIC_ASSERT(sizeof(i64) == 8, "i64 must be 8 bytes");
 STATIC_ASSERT(sizeof(f32) == 4, "f32 must be 4 bytes");
 STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
+
+
+#ifdef MN_PLATFORM_WINDOWS
+#ifdef MN_DLL_EXPORT
+#define MANNA_API __declspec(dllexport)
+#else
+#define MANNA_API __declspec(dllimport)
+#endif
+#else
+#define MANNA_API
+#endif

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "platform/platform.h"
+#include "defines.h"
 
 MANNA_API void test()
 {
