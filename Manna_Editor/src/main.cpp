@@ -10,7 +10,7 @@ int main() {
 	M_INFO("Info!");
 	M_TRACE("Trace!");
 
-	M_ASSERT(FALSE, "Assert!");
+	M_ASSERT(1 == 0, "Assert!");
 
 	return 0;
 }

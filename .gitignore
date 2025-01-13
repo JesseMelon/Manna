@@ -5,7 +5,7 @@
 .vs
 *.filters
 *.user
-*.scxproj
+*.vcxproj
 
 # Compiled Object files
 *.slo
