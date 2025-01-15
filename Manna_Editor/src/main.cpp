@@ -1,16 +1,19 @@
 #include <manna.h>
 
+//resume ep 6
+
 int main() {
-	//test();
+	
+	application_create_info config;
+	config.title = "Manna Editor";
+	config.x = 100;
+	config.y = 100;
+	config.width = 1280;
+	config.height = 720;
 
-	M_FATAL("Fatal! %f:", 1.0);
-	M_ERROR("Error!");
-	M_WARN("Warn!");
-	M_DEBUG("Debug!");
-	M_INFO("Info!");
-	M_TRACE("Trace!");
+	M_DEBUG("%d", create_application(&config));
 
-	M_ASSERT(1 == 0, "Assert!");
+	run_application();
 
 	return 0;
 }

@@ -1,5 +1,7 @@
 #include "logger.h"
 #include "asserts.h"
+#include "platform/platform.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -18,15 +20,19 @@ void log(log_level level, const char* message, ...) {
 	//TODO add to a thread
 	const char* levels[6] = { "FATAL", "ERROR", "WARNING","DEBUG", "INFO", "TRACE"};
 	b8 is_error = level > LOG_WARN;
-
-	char buffer[1024]; //TODO mind the limit
+	const i32 msg_length = 32000;
+	char buffer[msg_length]; //TODO mind the limit
 
 	va_list args;
 	va_start(args, message);
 	int written = snprintf(buffer, sizeof(buffer), "[%s]: ", levels[level]);	//prepend level
 	vsnprintf(buffer + written, sizeof(buffer) - written, message, args);		//pass message
+	snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\n");	//null terminate
 	va_end(args);
 
-	//TODO platform specific output
-	printf("%s\n", buffer);
+	if (is_error) {
+		platform_console_write_error(buffer, level);
+	} else {
+		platform_console_write(buffer, level);
+	}
 }
