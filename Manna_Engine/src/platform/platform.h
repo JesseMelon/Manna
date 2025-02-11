@@ -6,7 +6,7 @@ typedef struct platform_state {
 	void* internal_state;
 } platform_state;
 
-MANNA_API b8 platform_startup(
+b8 platform_startup(
 	platform_state* state,
 	const char* title,
 	i32 x,
@@ -15,12 +15,12 @@ MANNA_API b8 platform_startup(
 	i32 height);
 
 //TODO: remove API exports
-MANNA_API void platform_shutdown(platform_state* state);
+void platform_shutdown(platform_state* state);
 
-MANNA_API b8 platform_update(platform_state* state);
+b8 platform_get_messages(platform_state* state);
 
-void* platform_allocate(u64, b8 aligned);
-void platform_free(void* block, b8 aligned);
+MANNA_API void* platform_allocate(u64, b8 aligned);
+MANNA_API void platform_free(void* block, b8 aligned);
 void* platform_zero_memory(void* block, u64 size);
 void* platform_copy_memory(void* dst, void* src, u64 size);
 void* platform_set_memory(void* block, u8 value, u64 size);

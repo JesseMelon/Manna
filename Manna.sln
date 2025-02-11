@@ -1,9 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Manna_Editor", "Manna_Editor\Manna_Editor.vcxproj", "{96BD0822-8220-98C6-2BA6-D07C17E86349}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "manna_editor", "manna_editor\manna_editor.vcxproj", "{D67D198B-C2E0-A82F-6B66-E1E557A874B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3} = {252BCD8B-118E-5C30-BA13-95E6A65528B3}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Manna_Engine", "Manna_Engine\Manna_Engine.vcxproj", "{E56ABC22-D1CD-4BC7-7A53-847D6695174A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "manna_engine", "manna_engine\manna_engine.vcxproj", "{252BCD8B-118E-5C30-BA13-95E6A65528B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,18 +15,18 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Debug|x64.ActiveCfg = Debug|x64
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Debug|x64.Build.0 = Debug|x64
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Dist|x64.ActiveCfg = Dist|x64
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Dist|x64.Build.0 = Dist|x64
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Release|x64.ActiveCfg = Release|x64
-		{96BD0822-8220-98C6-2BA6-D07C17E86349}.Release|x64.Build.0 = Release|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Debug|x64.ActiveCfg = Debug|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Debug|x64.Build.0 = Debug|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Dist|x64.ActiveCfg = Dist|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Dist|x64.Build.0 = Dist|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Release|x64.ActiveCfg = Release|x64
-		{E56ABC22-D1CD-4BC7-7A53-847D6695174A}.Release|x64.Build.0 = Release|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Debug|x64.ActiveCfg = Debug|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Debug|x64.Build.0 = Debug|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Dist|x64.ActiveCfg = Dist|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Dist|x64.Build.0 = Dist|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Release|x64.ActiveCfg = Release|x64
+		{D67D198B-C2E0-A82F-6B66-E1E557A874B2}.Release|x64.Build.0 = Release|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Debug|x64.ActiveCfg = Debug|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Debug|x64.Build.0 = Debug|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Dist|x64.ActiveCfg = Dist|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Dist|x64.Build.0 = Dist|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Release|x64.ActiveCfg = Release|x64
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

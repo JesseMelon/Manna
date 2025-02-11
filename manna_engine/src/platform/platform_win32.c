@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <windowsx.h> //for input 
+#include <stdlib.h>
 
 typedef struct internal_state {
 	HINSTANCE instance;
@@ -25,8 +26,8 @@ b8 platform_startup(
 	i32 width,
 	i32 height) {
 
-	platform_state->internal_state = malloc(sizeof(internal_state));
-	if(!platform_state->internal_state) { return false; }
+	platform_state->internal_state = malloc(sizeof(internal_state)); //instantiate internal state
+	if(!platform_state->internal_state) { return FALSE; }
 
 	internal_state *state = (internal_state *)platform_state->internal_state; //state variable = internal_state variable casted to windows specific internal_state type
 
@@ -49,7 +50,7 @@ b8 platform_startup(
 	//register window class
 	if (!RegisterClassA(&wc)) {
 		MessageBoxA(0, "Window registration failed", "Error", MB_ICONEXCLAMATION | MB_OK); //error popup
-		return false;
+		return FALSE;
 	}
 
 	//Create Window
@@ -58,7 +59,7 @@ b8 platform_startup(
 
 	//calculate border size
 	RECT border_rect = {0};
-	AdjustWindowRectEx(&border_rect, window_style, false, window_style_ex);
+	AdjustWindowRectEx(&border_rect, window_style, FALSE, window_style_ex);
 
 	x += border_rect.left;
 	y += border_rect.top;
@@ -81,8 +82,8 @@ b8 platform_startup(
 
 	if (!window_handle) {
 		MessageBoxA(0, "Window creation failed", "Error", MB_ICONEXCLAMATION | MB_OK); //error popup
-		LOG_FATAL("Window creation failed");
-		return false;
+		M_FATAL("Window creation failed");
+		return FALSE;
 	} else {
 		state->window = window_handle;
 	}
@@ -99,7 +100,7 @@ b8 platform_startup(
 	clock_frequency = 1.0 / (f64)frequency.QuadPart;
 	QueryPerformanceCounter(&start_time);
 
-	return true;
+	return TRUE;
 }
 
 void platform_shutdown(platform_state* platform_state) {
@@ -111,14 +112,14 @@ void platform_shutdown(platform_state* platform_state) {
 	}
 }
 
-b8 platform_update(platform_state* platform_state) {
+b8 platform_get_messages (platform_state* platform_state) {
 	MSG msg;
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
-	return true;
+	return TRUE;
 }
 
 void *platform_allocate(u64 size, b8 aligned)

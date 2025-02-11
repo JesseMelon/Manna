@@ -4,19 +4,33 @@ workspace "Manna"
 	configurations { "Debug", "Release", "Dist" }
 	startproject "Editor"
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "Manna_Engine"
-	location "Manna_Engine"
+	-- Detect the platform and set the build system accordingly. this might all technically be unnessary since it detects ninja installation, and possibly also clang
+    if _OPTIONS["os"] == "windows" then
+        -- Visual Studio for Windows
+        toolset "vstudio"
+    elseif _OPTIONS["os"] == "linux" then
+        -- Ninja for Linux
+        makefiles "ninja"
+        toolset "clang"
+    elseif _OPTIONS["os"] == "macosx" then
+        -- Ninja for macOS
+        makefiles "ninja"
+        toolset "clang" 
+    end
+
+project "manna_engine"
+	location "manna_engine"
 	kind "SharedLib" 
-	language "C++"
+	language "C"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
 	files {
 		"%{prj.name}/**.h",
-		"%{prj.name}/**.cpp"
+		"%{prj.name}/**.c"
 	}
 
 	includedirs {
@@ -25,7 +39,6 @@ project "Manna_Engine"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		staticruntime "On"
 		systemversion "latest"
 
@@ -35,7 +48,6 @@ project "Manna_Engine"
 		}
 
 	filter "system:linux"
-		cppdialect "C++17"
 		staticruntime "On"
 
 		defines {
@@ -61,27 +73,28 @@ project "Manna_Engine"
 	filter { "system:windows", "configurations:Release"}
 		buildoptions "/MT" 
 
-project "Manna_Editor"
-	location "Manna_Editor"
+project "manna_editor"
+	location "manna_editor"
 	kind "ConsoleApp" 
-	language "C++"
+	language "C"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
 	files {
 		"%{prj.name}/**.h",
-		"%{prj.name}/**.cpp"
+		"%{prj.name}/**.c"
 	}
 
 	includedirs {
-		"Manna_Engine/include",
+		"manna_engine/include",
 	}
 
-	links { "Manna_Engine" }
+	links { "manna_engine" }
+
+	dependson { "manna_engine" }
 
 	filter "system:windows"
-		cppdialect "C++17"
 		staticruntime "On"
 		systemversion "latest"
 
@@ -90,22 +103,18 @@ project "Manna_Editor"
 		}
 
 		postbuildcommands {
-			"{COPY} %{wks.location}bin/" .. outputdir .. "/Manna_engine/Manna_Engine.dll %{cfg.targetdir}"
+			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.dll %{cfg.targetdir}"
 		}
 
 	filter "system:linux"
-		cppdialect "C++17"
 		staticruntime "On"
 
 		defines {
 			"MN_PLATFORM_LINUX",
 		}
 
-		links {
-		}
-
 		postbuildcommands {
-			"{COPY} %{wks.location}bin/" .. outputdir .. "/Manna_engine/Manna_Engine.so %{cfg.targetdir}"
+			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.so %{cfg.targetdir}"
 		}
 
 	filter "configurations:Debug"
