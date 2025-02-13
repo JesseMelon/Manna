@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Single-Compile",
+			"type": "shell",
+			"command": "clang++ -std=c++20 -glldb -fstandalone-debug ${relativeFile} -o ${fileBasenameNoExtension}",
+		},
+		{
+			"label": "Clean",
+			"type": "shell",
+			"command": "rm ${fileBasenameNoExtension}",
+		},
+		{
+			"label": "Generate Projects",
+			"type": "shell",
+			"command": "./thirdparty/bin/premake5/linux/premake5",
+		}
+	]
+
+}
