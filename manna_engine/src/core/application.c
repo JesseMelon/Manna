@@ -1,7 +1,7 @@
 #include "application.h"
 #include "logger.h"
-#include "platform/platform.h"
-#include "core/memory.h"
+#include "../platform/platform.h"
+#include "../core/memory.h"
 #include "api_types.h"
 
 typedef struct application_state {

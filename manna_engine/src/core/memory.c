@@ -3,6 +3,7 @@
 #include "platform/platform.h"
 
 //TODO not string.h
+#define _POSIX_C_SOURCE 200809L
 #include <string.h>
 #include <stdio.h>
 
@@ -60,7 +61,7 @@ char* get_memory_usage() {
 	const u64 mib = 1024 * 1024;
 	const u64 kib = 1024;
 
-	char buffer[8000] = "System memory use: \n";
+	char buffer[8000] = "System memory use: \n"; //TODO make const?
 	u64 offset = strlen(buffer);
 
 	for (u32 i = 0; i < MEMORY_TAG_COUNT; i++) {
@@ -86,6 +87,6 @@ char* get_memory_usage() {
 		i32 len = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
 		offset += len;
 	}
-	char* out_string = _strdup(buffer);
+	char* out_string = strdup(buffer);
 	return out_string; //free this
 }

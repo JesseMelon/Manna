@@ -25,7 +25,6 @@ typedef char b8;
 	#define STATIC_ASSERT static_assert
 #endif
 
-//ensure types are the correct size
 STATIC_ASSERT(sizeof(u8) == 1, "u8 must be 1 byte");
 STATIC_ASSERT(sizeof(u16) == 2, "u16 must be 2 bytes");
 STATIC_ASSERT(sizeof(u32) == 4, "u32 must be 4 bytes");
@@ -39,11 +38,15 @@ STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
 
 
 #ifdef MN_PLATFORM_WINDOWS
-#ifdef MN_DLL_EXPORT
-#define MANNA_API __declspec(dllexport)
-#else
-#define MANNA_API __declspec(dllimport)
-#endif
-#else
-#define MANNA_API
+    #ifdef MN_DLL_EXPORT
+        #define MANNA_API __declspec(dllexport)
+    #else
+        #define MANNA_API __declspec(dllimport)
+    #endif
+#elif MN_PLATFORM_LINUX
+    #ifdef MN_SO_EXPORT
+        #define MANNA_API __attribute__((visibility("default")))
+    #else
+        #define MANNA_API 
+    #endif
 #endif

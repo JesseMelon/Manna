@@ -1,28 +1,23 @@
 workspace "Manna"
 	architecture "x64"
+    cdialect "C17"
 
 	configurations { "Debug", "Release", "Dist" }
 	startproject "Editor"
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-	-- Detect the platform and set the build system accordingly. this might all technically be unnessary since it detects ninja installation, and possibly also clang
     if _OPTIONS["os"] == "windows" then
-        -- Visual Studio for Windows
         toolset "vstudio"
     elseif _OPTIONS["os"] == "linux" then
-        -- Ninja for Linux
-        makefiles "ninja"
         toolset "clang"
     elseif _OPTIONS["os"] == "macosx" then
-        -- Ninja for macOS
-        makefiles "ninja"
-        toolset "clang" 
+        toolset "clang"
     end
 
 project "manna_engine"
 	location "manna_engine"
-	kind "SharedLib" 
+	kind "SharedLib"
 	language "C"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -34,8 +29,9 @@ project "manna_engine"
 	}
 
 	includedirs {
-		"%{prj.name}/include", 
-		"%{prj.name}/src"     
+		"%{prj.name}/include",
+		"%{prj.name}/src",
+        os.getenv("VULKAN_SDK") .. "/include" or "" --if Vulkan SDK is not installed, the <or ""> prevents an error, but it will need to be installed to compile
 	}
 
 	filter "system:windows"
@@ -46,6 +42,12 @@ project "manna_engine"
 			"MN_PLATFORM_WINDOWS",
 			"MN_DLL_EXPORT"
 		}
+        libdirs {
+            os.getenv("VULKAN_SDK") .. "/Lib" or ""
+        }
+        links {
+            "vulkan-1"
+        }
 
 	filter "system:linux"
 		staticruntime "On"
@@ -54,9 +56,30 @@ project "manna_engine"
 			"MN_PLATFORM_LINUX",
 			"MN_SO_EXPORT"
 		}
-
+        libdirs {
+            os.getenv("VULKAN_SDK") .. "/lib" or ""
+        }
 		links {
+            "vulkan"
 		}
+        linkoptions {
+            ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
+        }
+    filter "system:macosx"
+        staticruntime "On"
+        defines {
+            "MN_PLATFORM_MACOS",
+            "MN_SO_EXPORT"
+        }
+        libdirs {
+            os.getenv("VULKAN_SDK") .. "/lib" or ""
+        }
+        links {
+            "vulkan"
+        }
+        linkoptions {
+            ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
+        }
 
 	filter "configurations:Debug"
 		defines "MN_DEBUG"
@@ -65,17 +88,17 @@ project "manna_engine"
 	filter "configurations:Release"
 		defines "MN_RELEASE"
 		optimize "On"
-	
+
 	filter "configurations:Dist"
 		defines "MN_DIST"
 		optimize "On"
 
 	filter { "system:windows", "configurations:Release"}
-		buildoptions "/MT" 
+		buildoptions "/MT"
 
 project "manna_editor"
 	location "manna_editor"
-	kind "ConsoleApp" 
+	kind "ConsoleApp"
 	language "C"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -88,6 +111,7 @@ project "manna_editor"
 
 	includedirs {
 		"manna_engine/include",
+        "manna_engine/src", --TODO temporary, this is just exposing internal engine stuff until the API is carved out more
 	}
 
 	links { "manna_engine" }
@@ -116,6 +140,16 @@ project "manna_editor"
 		postbuildcommands {
 			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.so %{cfg.targetdir}"
 		}
+    filter "system:macosx"
+        staticruntime "On"
+
+        defines {
+            "MN_PLATFORM_MACOS"
+        }
+
+        postbuildcommands {
+            "{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.dylib %{cfg.targetdir}"
+        }
 
 	filter "configurations:Debug"
 		defines "MN_DEBUG"
@@ -124,7 +158,7 @@ project "manna_editor"
 	filter "configurations:Release"
 		defines "MN_RELEASE"
 		optimize "On"
-	
+
 	filter "configurations:Dist"
 		defines "MN_DIST"
 		optimize "On"

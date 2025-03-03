@@ -23,31 +23,31 @@ typedef enum log_level{
 b8 init_logger();
 void shutdown_logger();
 
-MANNA_API void log(log_level level, const char *message, ...); // variadic args for passing parameters into the out string
+MANNA_API void m_log(log_level level, const char *message, ...); // variadic args for passing parameters into the out string
 
-#define M_FATAL(message, ...) log(LOG_FATAL, message, __VA_ARGS__) //NOTE modern compilers should not need the ## to remove the trailing comma
-#define M_ERROR(message, ...) log(LOG_ERROR, message, __VA_ARGS__)
+#define M_FATAL(message, ...) m_log(LOG_FATAL, message, ##__VA_ARGS__) //NOTE modern compilers should not need the ## to remove the trailing comma
+#define M_ERROR(message, ...) m_log(LOG_ERROR, message, ##__VA_ARGS__)
 
 #if LOG_WARN_ENABLED == 1
-#define M_WARN(message, ...) log(LOG_WARN, message, __VA_ARGS__)
+#define M_WARN(message, ...) m_log(LOG_WARN, message, ##__VA_ARGS__)
 #else
 #define LOG_WARN(message, ...)
 #endif
 
 #if LOG_DEBUG_ENABLED == 1
-#define M_DEBUG(message, ...) log(LOG_DEBUG, message, __VA_ARGS__)
+#define M_DEBUG(message, ...) m_log(LOG_DEBUG, message, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(message, ...)
 #endif
 
 #if LOG_INFO_ENABLED == 1
-#define M_INFO(message, ...) log(LOG_INFO, message, __VA_ARGS__)
+#define M_INFO(message, ...) m_log(LOG_INFO, message, ##__VA_ARGS__)
 #else
 #define LOG_INFO(message, ...)
 #endif
 
 #if LOG_TRACE_ENABLED == 1
-#define M_TRACE(message, ...) log(LOG_TRACE, message, __VA_ARGS__)
+#define M_TRACE(message, ...) m_log(LOG_TRACE, message, ##__VA_ARGS__)
 #else
 #define LOG_TRACE(message, ...)
 #endif

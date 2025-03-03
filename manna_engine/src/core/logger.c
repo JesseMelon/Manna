@@ -7,7 +7,7 @@
 #include <string.h>
 
 void report_assertion_fail(const char* file, int line, const char* expression, const char* message) {
-	log(LOG_FATAL, "Assertion Failed: %s File: %s Line: %d Message: %s\n", expression, file, line, message);
+	m_log(LOG_FATAL, "Assertion Failed: %s File: %s Line: %d Message: %s\n", expression, file, line, message);
 }
 b8 init_logger() {
 	//TODO create log file
@@ -16,7 +16,7 @@ b8 init_logger() {
 void shutdown_logger() {
 	//TODO cleanup logging/write queued entries
 }
-void log(log_level level, const char* message, ...) {
+void m_log(log_level level, const char* message, ...) {
 	//TODO add to a thread
 	const char* levels[6] = { "FATAL", "ERROR", "WARNING","DEBUG", "INFO", "TRACE"};
 	b8 is_error = level > LOG_WARN;
