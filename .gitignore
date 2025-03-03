@@ -1,6 +1,17 @@
 # Prerequisites
 *.d
 
+#Ignore Makefiles
+Makefiles
+makefile
+*.mk
+
+#ignore .cache dir
+.cache/
+
+#ignore compile_commands.json (worth sharing if its portable and useful for syncing workspaces)
+compile_commands.json
+
 # Visual Studio Files
 .vs
 *.filters
