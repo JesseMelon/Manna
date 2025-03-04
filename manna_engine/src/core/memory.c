@@ -81,7 +81,7 @@ char* get_memory_usage() {
 		}
 		else {
 			unit[0] = 'B';
-			unit[1] = '0';
+			unit[1] = 0;
 			amount = (float)stats.tagged_allocations[i];
 		}
 		i32 len = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);

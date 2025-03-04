@@ -50,6 +50,7 @@ project "manna_engine"
         }
 
 	filter "system:linux"
+        targetname = "libmanna_engine"
 		staticruntime "On"
 
 		defines {
@@ -136,10 +137,11 @@ project "manna_editor"
 		}
 
 		postbuildcommands {
-			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.dll %{cfg.targetdir}"
+			"{COPY} %{wks.location}/bin/" .. outputdir .. "/manna_engine/manna_engine.dll %{cfg.targetdir}"
 		}
 
 	filter "system:linux"
+        targetname = "libmanna_editor"
 		staticruntime "On"
 
 		defines {
@@ -147,7 +149,7 @@ project "manna_editor"
 		}
 
 		postbuildcommands {
-			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.so %{cfg.targetdir}"
+			"{COPY} %{wks.location}/bin/" .. outputdir .. "/manna_engine/libmanna_engine.so %{cfg.targetdir}"
 		}
 
     filter "system:macosx"
@@ -158,7 +160,7 @@ project "manna_editor"
         }
 
         postbuildcommands {
-            "{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.dylib %{cfg.targetdir}"
+            "{COPY} %{wks.location}/bin/" .. outputdir .. "/manna_engine/manna_engine.dylib %{cfg.targetdir}"
         }
 
 	filter "configurations:Debug"

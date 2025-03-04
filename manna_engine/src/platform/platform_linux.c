@@ -14,8 +14,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h> //sudo apt-get install libxkbcommon-x11-dev and libx11-xcb-dev
 //different distributions use different sleep functions
+
+#if _POSIX_C_SOURCE >= 199309L
 #include <time.h>
+#else
 #include <unistd.h>
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -196,14 +200,20 @@ void* platform_set_memory(void *block, u8 value, u64 size) {
 void platform_console_write(const char *str, u8 color) {
     // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
     const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
+    printf("\033[0m");
     printf("\033[%sm%s\033[0m", colour_strings[color], str);
+    printf("DEBUG: After color %d\n", color);  // Confirm reset
+    fflush(stdout);
 }
 
 //just using stdout still for errors on linux
 void platform_console_write_error(const char *str, u8 color) {
     // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
     const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
+    printf("\033[0m");
     printf("\033[%sm%s\033[0m", colour_strings[color], str);
+    printf("DEBUG: After color %d\n", color);  // Confirm reset
+    fflush(stdout);
 }
 
 f64 platform_get_time() {
@@ -213,7 +223,7 @@ f64 platform_get_time() {
 }
 
 void platform_sleep(u64 ms) {
-    //ubuntu actually tends to use the top option here, despite it appearing un-highlighted.
+    //ubuntu tends to use the top option here
 #if _POSIX_C_SOURCE >= 199309L
     struct timespec ts;
     ts.tv_sec = ms / 1000;
@@ -223,7 +233,7 @@ void platform_sleep(u64 ms) {
     if (ms >= 1000) {
         sleep(ms / 1000);
     }
-    nanosleep((ms % 1000) * 1000);
+    usleep((ms % 1000) * 1000);
 #endif
 }
 
