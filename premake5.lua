@@ -1,6 +1,6 @@
 workspace "Manna"
 	architecture "x64"
-    cdialect "C17"
+    cdialect "gnu17"
 
 	configurations { "Debug", "Release", "Dist" }
 	startproject "Editor"
@@ -61,7 +61,11 @@ project "manna_engine"
             "usr/X11R6/lib"
         }
 		links {
-            "vulkan"
+            "vulkan",
+            "xcb",
+            "X11",
+            "X11-xcb",
+            "xkbcommon"
 		}
         linkoptions {
             ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""

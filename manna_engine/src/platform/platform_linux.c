@@ -1,5 +1,4 @@
-#include "platform.h"
-#include <xcb/xproto.h>
+#include "platform/platform.h"
 
 #if M_PLATFORM_LINUX
 
@@ -7,18 +6,16 @@
 
 //in linux, windowing uses a client-server architecture. X11 is the server, Xlib and Xcb (newer) are clients
 //somewhat popular is an Xlib/Xcb hybrid
+
+//TODO revisit all of this with Wayland 
 #include <xcb/xcb.h>
 #include <X11/keysym.h>
 #include <X11/XKBlib.h> //sudo apt-get install libx11-dev
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h> //sudo apt-get install libxkbcommon-x11-dev and libx11-xcb-dev
-
 //different distributions use different sleep functions
-#if _POSIX_C_SOURCE >= 199309L
 #include <time.h>
-#else
 #include <unistd.h>
-#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,13 +32,13 @@ typedef struct internal_state {
 
 b8 platform_startup(platform_state* platform_state, const char* title, i32 x, i32 y, i32 width, i32 height) {
 
-    platform_state->internal_state = malloc(sizeof(internal_state));
+    platform_state->internal_state = malloc(sizeof(internal_state)); //memory exists for life of app
     internal_state* state = (internal_state*)platform_state->internal_state;
 
-    //connect to X
+    //connect to X via Xlib, TODO look into switching to pure XCB
     state->display = XOpenDisplay(NULL);
 
-    //will not use key repeats. This is global across the OS, so we need to turn it back on later.
+    //will not use key repeats. This is global across the OS, so we need to turn it back on later. //TODO look into switching to pure XCB
     XAutoRepeatOff(state->display);
 
     state->connection = XGetXCBConnection(state->display);
@@ -95,57 +92,139 @@ b8 platform_startup(platform_state* platform_state, const char* title, i32 x, i3
     xcb_change_property(state->connection, XCB_PROP_MODE_REPLACE, state->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(title), title);
 
     //intercept delete events
+    //Events to listen for
     xcb_intern_atom_cookie_t wm_delete_cookie = xcb_intern_atom(state->connection, 0, strlen("WM_DELETE_WINDOW"), "WM_DELETE_WINDOW");
     xcb_intern_atom_cookie_t wm_protocols_cookie = xcb_intern_atom(state->connection, 0, strlen("WM_PROTOCOLS"), "WM_PROTOCOLS");
+    //function pointers to execute
     xcb_intern_atom_reply_t* wm_delete_reply = xcb_intern_atom_reply(state->connection, wm_delete_cookie, NULL);
     xcb_intern_atom_reply_t* wm_protocols_reply = xcb_intern_atom_reply(state->connection, wm_protocols_cookie, NULL);
+
     state->wm_delete_win = wm_delete_reply->atom;
     state->wm_protocols = wm_protocols_reply->atom;
 
+    //
+    xcb_change_property(state->connection, XCB_PROP_MODE_REPLACE, state->window, wm_protocols_reply->atom, 4, 32, 1, &wm_delete_reply->atom);
+
+    xcb_map_window(state->connection, state->window);
+
+    //flush stream
+    i32 stream_result = xcb_flush(state->connection);
+    if (stream_result <= 0) {
+        LOG_FATAL("Error flushing window stream: %d", stream_result);
+        return FALSE;
+    }
+
+    return TRUE;
+
 }
 
-void platform_shutdown(platform_state *state) {
+void platform_shutdown(platform_state* platform_state) {
+    internal_state* state = (internal_state*) platform_state->internal_state;
 
+    //turn key repeats back on since it is global for the OS. Cringe.
+    XAutoRepeatOn(state->display);
+
+    xcb_destroy_window(state->connection, state->window);
 }
 
-b8 platform_get_messages(platform_state *state) {
+b8 platform_get_messages(platform_state *platform_state) {
+    internal_state* state = (internal_state*)platform_state->internal_state;
 
+    xcb_generic_event_t* event;                     //XCB dynamically allocates this event. JEEEEEEZ. 
+    xcb_client_message_event_t* client_message;
+
+    b8 quitting = FALSE;
+
+    while (event != 0) {
+        event = xcb_poll_for_event(state->connection);
+        if (event == 0) {
+            break;
+        }
+
+        switch (event->response_type & ~0x80) { //bitwise nonsense is required for basic use of XCB api. weird.
+            case XCB_KEY_PRESS:
+            case XCB_KEY_RELEASE: {
+                //handle key press and release
+            } break;
+            case XCB_BUTTON_PRESS:
+            case XCB_BUTTON_RELEASE: {
+                //handle mouse buttons
+            } break;
+            case XCB_MOTION_NOTIFY: {
+                //mouse movement
+            } break;
+            case XCB_CONFIGURE_NOTIFY: {
+                //window resize
+            } break;
+            case XCB_CLIENT_MESSAGE: {
+                client_message = (xcb_client_message_event_t*)event;
+                
+                //window close
+                if(client_message->data.data32[0] == state->wm_delete_win) {
+                    quitting = TRUE;
+                }
+            } break;
+            default:
+                break;
+        }
+
+        free(event);
+    }
+    return !quitting;
 }
 
-void* platform_allocate(u64, b8 aligned) {
-
+void* platform_allocate(u64 size, b8 aligned) {
+    return malloc(size);
 }
 
-void platform_free(void *block, b8 aligned) {
-
+void platform_free(void *ptr, b8 aligned) {
+    free(ptr);
 }
 
 void* platform_zero_memory(void *block, u64 size) {
-    
+    return memset(block, 0, size);
 }
 
 void* platform_copy_memory(void *dst, void *src, u64 size) {
-
+    return memcpy(dst, src, size);
 }
 
 void* platform_set_memory(void *block, u8 value, u64 size) {
-
+    return memset(block, value, size);
 }
 
 void platform_console_write(const char *str, u8 color) {
-
+    // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
+    const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
+    printf("\033[%sm%s\033[0m", colour_strings[color], str);
 }
 
+//just using stdout still for errors on linux
 void platform_console_write_error(const char *str, u8 color) {
-
+    // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
+    const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
+    printf("\033[%sm%s\033[0m", colour_strings[color], str);
 }
 
 f64 platform_get_time() {
-
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    return now.tv_sec + now.tv_nsec * 0.000000001;
 }
 
 void platform_sleep(u64 ms) {
-
+    //ubuntu actually tends to use the top option here, despite it appearing un-highlighted.
+#if _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000 * 1000;
+    nanosleep(&ts,0);
+#else
+    if (ms >= 1000) {
+        sleep(ms / 1000);
+    }
+    nanosleep((ms % 1000) * 1000);
+#endif
 }
 
 #endif
