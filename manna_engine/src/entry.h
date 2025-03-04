@@ -20,25 +20,25 @@ int main() {
 
 	//verify game is created
 	if (!create_game(&game_instance)) {
-		M_FATAL("Failed to create game.");
+		LOG_FATAL("Failed to create game.");
 		return -1;
 	}
 
 	//verify function bindings
 	if (!game_instance.initialize || !game_instance.update || !game_instance.render || !game_instance.on_resize) {
-		M_FATAL("Invalid function pointers!");
+		LOG_FATAL("Invalid function pointers!");
 		return -2;
 	}
 
 	//initialize application
 	if (!application_create(&game_instance)) {
-		M_INFO("Application failed to create.");
+		LOG_INFO("Application failed to create.");
 		return 1;
 	}
 
 	//begin game loop
 	if (!application_run()) {
-		M_INFO("Application did not shut down gracefully.");
+		LOG_INFO("Application did not shut down gracefully.");
 		return 2;
 	}
 

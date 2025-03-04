@@ -1,7 +1,8 @@
 #include "logger.h"
-#include "asserts.h"
+#include "asserts.h"    // implements report assertion fail
 #include "platform/platform.h"
 
+//TODO temporary
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

@@ -39,8 +39,8 @@ project "manna_engine"
 		systemversion "latest"
 
 		defines {
-			"MN_PLATFORM_WINDOWS",
-			"MN_DLL_EXPORT"
+			"M_PLATFORM_WINDOWS",
+			"M_DLL_EXPORT"
 		}
         libdirs {
             os.getenv("VULKAN_SDK") .. "/Lib" or ""
@@ -53,11 +53,12 @@ project "manna_engine"
 		staticruntime "On"
 
 		defines {
-			"MN_PLATFORM_LINUX",
-			"MN_SO_EXPORT"
+			"M_PLATFORM_LINUX",
+			"M_SO_EXPORT"
 		}
         libdirs {
-            os.getenv("VULKAN_SDK") .. "/lib" or ""
+            os.getenv("VULKAN_SDK") .. "/lib" or "",
+            "usr/X11R6/lib"
         }
 		links {
             "vulkan"
@@ -68,29 +69,33 @@ project "manna_engine"
     filter "system:macosx"
         staticruntime "On"
         defines {
-            "MN_PLATFORM_MACOS",
-            "MN_SO_EXPORT"
+            "M_PLATFORM_MACOS",
+            "M_SO_EXPORT"
         }
         libdirs {
             os.getenv("VULKAN_SDK") .. "/lib" or ""
         }
         links {
-            "vulkan"
+            "vulkan", ---lvulkan
+            "xcb",
+            "X11",
+            "X11-xcb",
+            "xkbcommon"
         }
         linkoptions {
             ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
         }
 
 	filter "configurations:Debug"
-		defines "MN_DEBUG"
+        defines "DEBUG"
 		symbols "On"
 
 	filter "configurations:Release"
-		defines "MN_RELEASE"
+		defines "RELEASE"
 		optimize "On"
 
 	filter "configurations:Dist"
-		defines "MN_DIST"
+		defines "DIST"
 		optimize "On"
 
 	filter { "system:windows", "configurations:Release"}
@@ -123,7 +128,7 @@ project "manna_editor"
 		systemversion "latest"
 
 		defines {
-			"MN_PLATFORM_WINDOWS",
+			"M_PLATFORM_WINDOWS",
 		}
 
 		postbuildcommands {
@@ -134,17 +139,18 @@ project "manna_editor"
 		staticruntime "On"
 
 		defines {
-			"MN_PLATFORM_LINUX",
+			"M_PLATFORM_LINUX",
 		}
 
 		postbuildcommands {
 			"{COPY} %{wks.location}bin/" .. outputdir .. "/manna_engine/manna_engine.so %{cfg.targetdir}"
 		}
+
     filter "system:macosx"
         staticruntime "On"
 
         defines {
-            "MN_PLATFORM_MACOS"
+            "M_PLATFORM_MACOS"
         }
 
         postbuildcommands {
@@ -152,13 +158,13 @@ project "manna_editor"
         }
 
 	filter "configurations:Debug"
-		defines "MN_DEBUG"
+        defines "DEBUG"
 		symbols "On"
 
 	filter "configurations:Release"
-		defines "MN_RELEASE"
+		defines "RELEASE"
 		optimize "On"
 
 	filter "configurations:Dist"
-		defines "MN_DIST"
+		defines "DIST"
 		optimize "On"

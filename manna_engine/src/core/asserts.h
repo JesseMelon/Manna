@@ -16,7 +16,7 @@ MANNA_API void report_assertion_fail(const char* file, int line, const char* exp
 
 #define M_ASSERT(expr, msg) if (expr) {} else { report_assertion_fail(__FILE__, __LINE__, #expr, msg); debugBreak(); }
 
-#ifdef _DEBUG
+#ifdef DEBUG
 #define M_ASSERT_DEBUG(expr, msg) if (expr) {} else { report_assertion_fail(__FILE__, __LINE__, #expr, msg); debugBreak(); } //for assertions made in debug builds only
 #else
 #define M_ASSERT_DEBUG(expr, msg)

@@ -2,7 +2,7 @@
 *.d
 
 #Ignore Makefiles
-Makefiles
+Makefile
 makefile
 *.mk
 
@@ -11,6 +11,9 @@ makefile
 
 #ignore compile_commands.json (worth sharing if its portable and useful for syncing workspaces)
 compile_commands.json
+
+# VS code files
+.vscode
 
 # Visual Studio Files
 .vs

@@ -25,7 +25,7 @@ void shutdown_memory() {}
 
 void* m_allocate(u64 size, memory_tag tag) {
 	if (tag == MEMORY_TAG_UNKNOWN) {
-		M_WARN("allocating from unknown memory");
+		LOG_WARN("allocating from unknown memory");
 	}
 
 	stats.total_allocated += size;
@@ -39,7 +39,7 @@ void* m_allocate(u64 size, memory_tag tag) {
 
 void m_free(void* memory, u64 size, memory_tag tag) {
 	if (tag == MEMORY_TAG_UNKNOWN) {
-		M_WARN("freeing from unknown memory tag");
+		LOG_WARN("freeing from unknown memory tag");
 	}
 	
 	stats.total_allocated -= size;

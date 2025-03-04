@@ -1,6 +1,6 @@
 #include "platform/platform.h"
 
-#if MN_PLATFORM_WINDOWS
+#if M_PLATFORM_WINDOWS
 
 #include "core/logger.h"
 
@@ -82,7 +82,7 @@ b8 platform_startup(
 
 	if (!window_handle) {
 		MessageBoxA(0, "Window creation failed", "Error", MB_ICONEXCLAMATION | MB_OK); //error popup
-		M_FATAL("Window creation failed");
+		LOG_FATAL("Window creation failed");
 		return FALSE;
 	} else {
 		state->window = window_handle;
@@ -122,7 +122,7 @@ b8 platform_get_messages (platform_state* platform_state) {
 	return TRUE;
 }
 
-void *platform_allocate(u64 size, b8 aligned)
+void* platform_allocate(u64 size, b8 aligned)
 {
 	return malloc(size);
 }
@@ -132,17 +132,17 @@ void platform_free(void *ptr, b8 aligned)
 	free(ptr);
 }
 
-void *platform_copy_memory(void* dest, void* src, u64 size)
+void* platform_copy_memory(void* dest, void* src, u64 size)
 {
 	return memcpy(dest, src, size);
 }
 
-void *platform_zero_memory(void* dest, u64 size)
+void* platform_zero_memory(void* dest, u64 size)
 {
 	return memset(dest, 0, size);
 }
 
-void *platform_set_memory(void* dest, u8 value, u64 size)
+void* platform_set_memory(void* dest, u8 value, u64 size)
 {
 	return memset(dest, value, size);
 }
@@ -236,4 +236,4 @@ LRESULT CALLBACK win32_window_event_handler(HWND window, UINT message, WPARAM w_
 	return DefWindowProcA(window, message, w_param, l_param);
 }
 
-#endif // MN_PLATFORM_WINDOWS
+#endif // M_PLATFORM_WINDOWS

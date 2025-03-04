@@ -37,14 +37,14 @@ STATIC_ASSERT(sizeof(f32) == 4, "f32 must be 4 bytes");
 STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
 
 
-#ifdef MN_PLATFORM_WINDOWS
-    #ifdef MN_DLL_EXPORT
+#ifdef M_PLATFORM_WINDOWS
+    #ifdef M_DLL_EXPORT
         #define MANNA_API __declspec(dllexport)
     #else
         #define MANNA_API __declspec(dllimport)
     #endif
-#elif MN_PLATFORM_LINUX
-    #ifdef MN_SO_EXPORT
+#elif M_PLATFORM_LINUX
+    #ifdef M_SO_EXPORT
         #define MANNA_API __attribute__((visibility("default")))
     #else
         #define MANNA_API 

@@ -19,7 +19,7 @@ static application_state app_state;
 
 b8 application_create(game* game_instance) {
 	if (is_initialized) {
-		M_ERROR("Application already initialized!");
+		LOG_ERROR("Application already initialized!");
 		return FALSE;
 	}
 
@@ -29,12 +29,12 @@ b8 application_create(game* game_instance) {
 	init_logger();
 
 	//TODO: remove this
-	M_FATAL("Fatal! %f:", 1.0);
-	M_ERROR("Error!");
-	M_WARN("Warn!");
-	M_DEBUG("Debug!");
-	M_INFO("Info!");
-	M_TRACE("Trace!");
+	LOG_FATAL("Fatal! %f:", 1.0);
+	LOG_ERROR("Error!");
+	LOG_WARN("Warn!");
+	LOG_DEBUG("Debug!");
+	LOG_INFO("Info!");
+	LOG_TRACE("Trace!");
 
 	app_state.is_running = TRUE;
 	app_state.is_suspended = FALSE;
@@ -52,7 +52,7 @@ b8 application_create(game* game_instance) {
 
 	//initialize game
 	if (!app_state.game_instance->initialize(app_state.game_instance)) {
-		M_FATAL("Failed to initialize game.");
+		LOG_FATAL("Failed to initialize game.");
 		return FALSE;
 	}
 
@@ -63,20 +63,20 @@ b8 application_create(game* game_instance) {
 }
 
 b8 application_run() {
-	M_INFO(get_memory_usage());
+	LOG_INFO(get_memory_usage());
 
 	while (app_state.is_running) {
 		if (!platform_get_messages(&app_state.platform)) return FALSE;
 
 		if (!app_state.is_suspended) {
 			if (!app_state.game_instance->update(app_state.game_instance, (f32)0.0)) {
-				M_FATAL("Failed to update game.");
+				LOG_FATAL("Failed to update game.");
 				app_state.is_running = FALSE;
 				break;
 			}
 
 			if (!app_state.game_instance->render(app_state.game_instance, (f32)0.0)) {
-				M_FATAL("Failed to render game.");
+				LOG_FATAL("Failed to render game.");
 				app_state.is_running = FALSE;
 				break;
 			}
