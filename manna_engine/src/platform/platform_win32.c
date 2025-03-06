@@ -132,7 +132,7 @@ void platform_free(void *ptr, b8 aligned)
 	free(ptr);
 }
 
-void* platform_copy_memory(void* dest, void* src, u64 size)
+void* platform_copy_memory(void* dest, const void* src, u64 size)
 {
 	return memcpy(dest, src, size);
 }

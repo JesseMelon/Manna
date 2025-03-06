@@ -189,7 +189,7 @@ void* platform_zero_memory(void *block, u64 size) {
     return memset(block, 0, size);
 }
 
-void* platform_copy_memory(void *dst, void *src, u64 size) {
+void* platform_copy_memory(void *dst, const void *src, u64 size) {
     return memcpy(dst, src, size);
 }
 
@@ -200,20 +200,14 @@ void* platform_set_memory(void *block, u8 value, u64 size) {
 void platform_console_write(const char *str, u8 color) {
     // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
     const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
-    printf("\033[0m");
     printf("\033[%sm%s\033[0m", colour_strings[color], str);
-    printf("DEBUG: After color %d\n", color);  // Confirm reset
-    fflush(stdout);
 }
 
 //just using stdout still for errors on linux
 void platform_console_write_error(const char *str, u8 color) {
     // FATAL,ERROR,WARN,DEBUG,INFO,TRACE
     const char* colour_strings[] = {"0;41", "1;31", "1;33", "1;34", "1;32", "1;30"};    //escape codes 
-    printf("\033[0m");
     printf("\033[%sm%s\033[0m", colour_strings[color], str);
-    printf("DEBUG: After color %d\n", color);  // Confirm reset
-    fflush(stdout);
 }
 
 f64 platform_get_time() {

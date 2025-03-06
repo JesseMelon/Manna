@@ -53,7 +53,7 @@ void* m_set_memory(void* memory, i32 value, u64 size) {
 	return platform_set_memory(memory, value, size);
 }
 
-void* m_copy_memory(void* destination, void* source, u64 size) {
+void* m_copy_memory(void* destination, const void* source, u64 size) {
 	return platform_copy_memory(destination, source, size);
 }
 char* get_memory_usage() {

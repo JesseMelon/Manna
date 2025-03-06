@@ -22,7 +22,7 @@ b8 platform_get_messages(platform_state* platform_state);
 MANNA_API void* platform_allocate(u64, b8 aligned);
 MANNA_API void platform_free(void* block, b8 aligned);
 void* platform_zero_memory(void* block, u64 size);
-void* platform_copy_memory(void* dst, void* src, u64 size);
+void* platform_copy_memory(void* dst, const void* src, u64 size);
 void* platform_set_memory(void* block, u8 value, u64 size);
 
 void platform_console_write(const char* str, u8 color);
