@@ -53,7 +53,7 @@ void* _darray_push(void* darray, const void* value_ptr) {
     u64 addr = (u64)darray;
     addr += (length * stride);
     m_copy_memory((void*)addr, value_ptr, stride);
-    _darray_set_field(darray, DARRAY_LENGTH, stride + 1); //increment length to reflect the addition of an element
+    _darray_set_field(darray, DARRAY_LENGTH, length + 1); //increment length to reflect the addition of an element
     return darray;
 }
 

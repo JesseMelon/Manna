@@ -104,7 +104,7 @@ b8 platform_startup(
 	return TRUE;
 }
 
-void platform_shutdown(platform_state* platform_state) {
+void shutdown_platform(platform_state* platform_state) {
 	internal_state * state = (internal_state *)platform_state->internal_state;
 
 	if (state->window) {

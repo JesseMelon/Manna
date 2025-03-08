@@ -63,7 +63,7 @@ void process_mouse_button(mouse_buttons button, b8 pressed) {
 
 void process_mouse_move(i16 x, i16 y) {
     if (state.mouse_current.x != x || state.mouse_current.y != y) {
-        LOG_DEBUG("Mouse pos: %i, %i", x, y);
+        //LOG_DEBUG("Mouse pos: %i, %i", x, y);
         state.mouse_current.x = x;
         state.mouse_current.y = y;
 

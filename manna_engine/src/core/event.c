@@ -33,7 +33,7 @@ b8 init_events() {
 }
 
 void shutdown_events() {
-    for (u16 i = 0; i < MAX_EVENT_ID; ++i) {
+    for (u16 i = 0; i < MAX_EVENTS; ++i) {
         if (state.events[i].listeners != 0) {
             darray_destroy(state.events[i].listeners);
             state.events[i].listeners = 0; //nullptr
@@ -43,7 +43,7 @@ void shutdown_events() {
 
 b8 listen_to_event(u16 event_id, void *listener, event_handler on_event) {
     //these ifs are kindof expensive. Should probably remove from dist and/or release builds
-    if (initialized) {
+    if (!initialized) {
         return FALSE;
     }
     if (state.events[event_id].listeners == 0) {
@@ -58,6 +58,7 @@ b8 listen_to_event(u16 event_id, void *listener, event_handler on_event) {
     }
     event_listener event_listener;
     event_listener.instance = listener;
+    event_listener.on_event = on_event;
     darray_push(state.events[event_id].listeners, event_listener);
     
     return TRUE;
