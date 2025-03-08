@@ -15,7 +15,7 @@ b8 platform_startup(
 	i32 height);
 
 //TODO: remove API exports
-void platform_shutdown(platform_state* platform_state);
+void shutdown_platform(platform_state* platform_state);
 
 b8 platform_get_messages(platform_state* platform_state);
 

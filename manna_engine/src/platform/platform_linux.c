@@ -122,7 +122,7 @@ b8 platform_startup(platform_state* platform_state, const char* title, i32 x, i3
 
 }
 
-void platform_shutdown(platform_state* platform_state) {
+void shutdown_platform(platform_state* platform_state) {
     internal_state* state = (internal_state*) platform_state->internal_state;
 
     //turn key repeats back on since it is global for the OS. Cringe.

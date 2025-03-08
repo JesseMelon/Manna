@@ -31,13 +31,13 @@ int main() {
 	}
 
 	//initialize application
-	if (!application_create(&game_instance)) {
+	if (!create_application(&game_instance)) {
 		LOG_INFO("Application failed to create.");
 		return 1;
 	}
 
 	//begin game loop
-	if (!application_run()) {
+	if (!run_application()) {
 		LOG_INFO("Application did not shut down gracefully.");
 		return 2;
 	}

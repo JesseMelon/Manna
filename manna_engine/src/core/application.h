@@ -12,6 +12,6 @@ typedef struct application_create_info {
 	char* title;
 } application_create_info;
 
-MANNA_API b8 application_create(struct game* game_instance);
+MANNA_API b8 create_application(struct game* game_instance);
 
-MANNA_API b8 application_run();
+MANNA_API b8 run_application();

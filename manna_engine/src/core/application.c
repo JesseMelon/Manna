@@ -19,7 +19,10 @@ typedef struct application_state {
 static b8 is_initialized = FALSE;
 static application_state app_state;
 
-b8 application_create(game* game_instance) {
+b8 application_on_event(u16 event_id, void* sender, void* listener_instance, event_data data);
+b8 application_on_key(u16 event_id, void* sender, void* listener_instance, event_data data);
+
+b8 create_application(game* game_instance) {
 	if (is_initialized) {
 		LOG_ERROR("Application already initialized!");
 		return FALSE;
@@ -47,6 +50,10 @@ b8 application_create(game* game_instance) {
         return FALSE;
     }
 
+    listen_to_event(EVENT_APPLICATION_QUIT, 0, application_on_event);
+    listen_to_event(EVENT_KEY_PRESSED, 0, application_on_key);
+    listen_to_event(EVENT_KEY_RELEASED, 0, application_on_key);
+
 	if (!platform_startup(
 		&app_state.platform,
 		game_instance->app_config.title,
@@ -70,7 +77,7 @@ b8 application_create(game* game_instance) {
 	return TRUE;
 }
 
-b8 application_run() {
+b8 run_application() {
 	LOG_INFO(get_memory_usage());
 
 	while (app_state.is_running) {
@@ -93,11 +100,48 @@ b8 application_run() {
 		}
 	}
 	app_state.is_running = FALSE;
-
+    
+    ignore_event(EVENT_APPLICATION_QUIT, 0, application_on_event);
+    ignore_event(EVENT_KEY_PRESSED, 0, application_on_key);
+    ignore_event(EVENT_KEY_RELEASED, 0, application_on_key);
     shutdown_events();
     shutdown_input();
 
-	platform_shutdown(&app_state.platform);
+	shutdown_platform(&app_state.platform);
 
 	return TRUE;
+}
+
+b8 application_on_event(u16 event_id, void* sender, void* listener_instance, event_data data) {
+    switch (event_id) {
+        case EVENT_APPLICATION_QUIT:
+            LOG_INFO("Appplication Quit event received, shutting down.\n");
+            app_state.is_running = FALSE;
+            return TRUE;
+    }
+    return FALSE;
+}
+
+b8 application_on_key(u16 event_id, void* sender, void* listener_instance, event_data data) {
+    if (event_id == EVENT_KEY_PRESSED) {
+        u16 key = data.u16[0];
+        if (key == KEY_ESCAPE) {
+            event_data event_data = {};
+            trigger_event(EVENT_APPLICATION_QUIT, 0, event_data);
+
+            return TRUE; //means this will not get handled again by anything else;
+        } else if (key == KEY_A) {
+            LOG_DEBUG("A key recognized");
+        } else {
+            LOG_DEBUG("'%c' key pressed in window", key);
+        }
+    } else if (event_id == EVENT_KEY_RELEASED) {
+        u16 key = data.u16[0];
+        if (key == KEY_B) {
+            LOG_DEBUG("B key release recognized");
+        } else {
+            LOG_DEBUG("'%c' key released in window", key);
+        }
+    }
+    return FALSE;
 }

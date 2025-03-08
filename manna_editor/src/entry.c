@@ -14,7 +14,7 @@ b8 create_game(game* out_game) {
 	out_game->initialize = game_initialize;
 	out_game->on_resize = game_on_resize;
 	
-	out_game->state = m_allocate(sizeof(game_state), MEMORY_TAG_UNKNOWN);
+	out_game->state = m_allocate(sizeof(game_state), MEMORY_TAG_EDITOR);
 	
 	return TRUE;
 }

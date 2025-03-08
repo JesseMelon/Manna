@@ -6,6 +6,7 @@ typedef enum memory_tag {
 	//TODO add tags
 	MEMORY_TAG_UNKNOWN,
     MEMORY_TAG_DARRAY,
+    MEMORY_TAG_EDITOR,
 	MEMORY_TAG_COUNT
 } memory_tag;
 
