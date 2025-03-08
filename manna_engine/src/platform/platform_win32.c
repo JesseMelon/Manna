@@ -3,6 +3,7 @@
 #if M_PLATFORM_WINDOWS
 
 #include "core/logger.h"
+#include "core/input.h"
 
 #include <windows.h>
 #include <windowsx.h> //for input 
@@ -16,7 +17,7 @@ typedef struct internal_state {
 static f64 clock_frequency;
 static LARGE_INTEGER start_time;
 
-LRESULT CALLBACK win32_window_event_handler(HWND window, UINT message, WPARAM w_param, LPARAM l_param); //forward declare window event handler
+LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM w_param, LPARAM l_param); //forward declare window event handler
 
 b8 platform_startup(
 	platform_state* platform_state,
@@ -37,7 +38,7 @@ b8 platform_startup(
 	HICON icon = LoadIcon(state->instance, IDI_APPLICATION);	//TODO: use (HICON)LoadImageW(instance, MAKEINTRESOURCE(MY_ICON), IMAGE_ICON, 32, 32, LR_LOADFROMFILE); for finer control. 
 	WNDCLASSA wc = {0};											//window class ANSI meaning 8 bit characters, as opposed to UNICODE - 16 bit characters
 	wc.style = CS_DBLCLKS;										//flags for window performance and style. Accepts double clicks in window
-	wc.lpfnWndProc = win32_window_event_handler;				//long pointer to window procedure function, function for handling window events
+	wc.lpfnWndProc = win32_window_process_message;				//long pointer to window procedure function, function for handling window events
 	wc.cbClsExtra = 0;											//legacy class specific mem allocation shared by all windows from this class
 	wc.cbWndExtra = 0;											//legacy window specific mem allocation
 	wc.hInstance = state->instance;								//handle to the program containing window procedure
@@ -184,7 +185,7 @@ void platform_sleep(u64 ms)
 	Sleep(ms);
 }
 
-LRESULT CALLBACK win32_window_event_handler(HWND window, UINT message, WPARAM w_param, LPARAM l_param) {
+LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM w_param, LPARAM l_param) {
 	switch (message) {
 		case WM_ERASEBKGND:
 			return 1;	//handle erasing in application
@@ -207,20 +208,24 @@ LRESULT CALLBACK win32_window_event_handler(HWND window, UINT message, WPARAM w_
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP: {
-			//b8 pressed = message == WM_KEYDOWN || message == WM_SYSKEYDOWN;
-			//TODO: input processing
+			//on key messages, w_param is a 16 bit data package with keycode, which is sent in to process key.
+			b8 pressed = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
+			keys key = (u16)w_param;
+			process_key(key, pressed);
+			
 		} break;
 		case WM_MOUSEMOVE: {
-			//i32 x = GET_X_LPARAM(l_param);
-			//i32 y = GET_Y_LPARAM(l_param);
-			//TODO: input processing
+			i32 x = GET_X_LPARAM(l_param);
+			i32 y = GET_Y_LPARAM(l_param);
+			process_mouse_move(x, y);
 		} break;
 		case WM_MOUSEWHEEL: {
-			//i32 delta = GET_WHEEL_DELTA_WPARAM(w_param);
-			//if (delta != 0) {
-			//	delta = (delta < 0) ? -1 : 1;
-			//	//TODO: input processing
-			//}
+			i32 delta = GET_WHEEL_DELTA_WPARAM(w_param);
+			if (delta != 0) {
+				//handle scroll sensitivity within the engine by normalizing this delta
+				delta = (delta < 0) ? -1 : 1;
+				process_mouse_wheel(delta);
+			}
 		} break;
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
@@ -228,8 +233,30 @@ LRESULT CALLBACK win32_window_event_handler(HWND window, UINT message, WPARAM w_
 		case WM_RBUTTONUP:
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP: {
-			//b8 pressed = message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN;
-			//TODO: input processing
+			b8 pressed = message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN;
+			mouse_buttons button = MB_COUNT;
+			switch (message) {
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+				button = MB_LEFT;
+				break;
+			case WM_MBUTTONDOWN:
+			case WM_MBUTTONUP:
+				button = MB_MIDDLE;
+				break;
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONUP:
+				button = MB_RIGHT;
+				break;
+			}
+
+			if (button != MB_COUNT) {
+				process_mouse_button(button, pressed);
+			}
+			else {
+				LOG_WARN("Unset mouse button after handling mouse button window message");
+			}
+
 		} break;
 	}
 

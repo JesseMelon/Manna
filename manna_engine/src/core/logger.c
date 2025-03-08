@@ -22,7 +22,7 @@ void m_log(log_level level, const char* message, ...) {
 	const char* levels[6] = { "FATAL", "ERROR", "WARNING","DEBUG", "INFO", "TRACE"};
 	b8 is_error = level > LOG_WARN;
 	const i32 msg_length = 32000;
-	char buffer[32000]; //TODO mind the limit
+	char buffer[msg_length]; //TODO mind the limit
 
 	va_list args;
 	va_start(args, message);

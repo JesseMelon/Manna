@@ -8,7 +8,7 @@ workspace "Manna"
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
     if _OPTIONS["os"] == "windows" then
-        toolset "vstudio"
+        toolset "clang"
     elseif _OPTIONS["os"] == "linux" then
         toolset "clang"
     elseif _OPTIONS["os"] == "macosx" then
