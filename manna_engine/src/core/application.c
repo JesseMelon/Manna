@@ -1,7 +1,9 @@
 #include "application.h"
+#include "core/input.h"
 #include "logger.h"
-#include "../platform/platform.h"
-#include "../core/memory.h"
+#include "platform/platform.h"
+#include "core/memory.h"
+#include "core/event.h"
 #include "api_types.h"
 
 typedef struct application_state {
@@ -27,6 +29,7 @@ b8 application_create(game* game_instance) {
 
 	//init subsystems
 	init_logger();
+    init_input();
 
 	//TODO: remove this
 	LOG_FATAL("Fatal! %f:", 1.0);
@@ -38,6 +41,11 @@ b8 application_create(game* game_instance) {
 
 	app_state.is_running = TRUE;
 	app_state.is_suspended = FALSE;
+
+    if (!init_events()) {
+        LOG_ERROR("Event system failed to initialize, quitting.");
+        return FALSE;
+    }
 
 	if (!platform_startup(
 		&app_state.platform,
@@ -80,9 +88,15 @@ b8 application_run() {
 				app_state.is_running = FALSE;
 				break;
 			}
+            //NOTE: things which rely on the state of input should be before the update input, update input sets up next frame;
+            update_input(0);
 		}
 	}
 	app_state.is_running = FALSE;
+
+    shutdown_events();
+    shutdown_input();
+
 	platform_shutdown(&app_state.platform);
 
 	return TRUE;

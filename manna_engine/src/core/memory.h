@@ -9,7 +9,7 @@ typedef enum memory_tag {
 	MEMORY_TAG_COUNT
 } memory_tag;
 
-MANNA_API void initialize_memory();
+MANNA_API void init_memory();
 MANNA_API void shutdown_memory();
 
 MANNA_API void* m_allocate(u64 size, memory_tag tag);

@@ -14,11 +14,12 @@ struct memory_stats {
 
 static const char* memory_tag_strings[MEMORY_TAG_COUNT] = {
 	"UNKNOWN",
+    "DARRAY"
 };
 
 static struct memory_stats stats;
 
-void initialize_memory() {
+void init_memory() {
 	platform_set_memory(&stats, 0, sizeof(stats));
 }
 void shutdown_memory() {}

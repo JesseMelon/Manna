@@ -32,7 +32,7 @@ MANNA_API void _darray_pop(void* darray, void* dest);
 MANNA_API void* _darray_pop_at(void* darray, u64 index, void* dest);
 MANNA_API void* _darray_insert_at(void* darray, u64 index, void* value_ptr);
 
-#define DARRAY_DEFAULT_CAPACITY 4
+#define DARRAY_DEFAULT_CAPACITY 1
 #define DARRAY_RESIZE_FACTOR 2
 
 #define darray_create(type) _darray_create(DARRAY_DEFAULT_CAPACITY, sizeof(type))
@@ -43,7 +43,7 @@ MANNA_API void* _darray_insert_at(void* darray, u64 index, void* value_ptr);
 
 //this is doing some magic with stack allocated value types here. making a temp var of type typeof(value) allows it to be passed by reference
 //note: could also use __auto_type. Both are GNU extensions
-#define darray_push(array, value)           \
+#define darray_push(darray, value)           \
 {                                           \
     typeof(value) temp = value;             \
     darray = _darray_push(darray, &temp);   \

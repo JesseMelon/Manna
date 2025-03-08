@@ -14,7 +14,7 @@ extern b8 create_game(game* out_game);
 
 int main() {
 
-	initialize_memory(); //lowest level subsystem init to begin tracking memory usage
+	init_memory(); //lowest level subsystem init to begin tracking memory usage
 
 	game game_instance;
 
