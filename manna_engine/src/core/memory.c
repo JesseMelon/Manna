@@ -17,7 +17,8 @@ static const char* memory_tag_strings[MEMORY_TAG_COUNT] = {
 	"UNKNOWN",
     "DARRAY",
     "EDITOR",
-    "STRING"
+    "STRING",
+    "RENDERER"
 };
 
 static struct memory_stats stats;

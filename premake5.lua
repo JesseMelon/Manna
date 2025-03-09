@@ -2,7 +2,7 @@ workspace "Manna"
 	architecture "x64"
     cdialect "gnu17"
 
-	configurations { "Debug", "Release", "Dist" }
+	configurations { "debug", "release", "dist" }
 	startproject "Editor"
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -91,15 +91,15 @@ project "manna_engine"
             ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
         }
 
-	filter "configurations:Debug"
+	filter "configurations:debug"
         defines "DEBUG"
 		symbols "On"
 
-	filter "configurations:Release"
+	filter "configurations:release"
 		defines "RELEASE"
 		optimize "On"
 
-	filter "configurations:Dist"
+	filter "configurations:dist"
 		defines "DIST"
 		optimize "On"
 
@@ -163,14 +163,14 @@ project "manna_editor"
             "{COPY} %{wks.location}/bin/" .. outputdir .. "/manna_engine/manna_engine.dylib %{cfg.targetdir}"
         }
 
-	filter "configurations:Debug"
+	filter "configurations:debug"
         defines "DEBUG"
 		symbols "On"
 
-	filter "configurations:Release"
+	filter "configurations:release"
 		defines "RELEASE"
 		optimize "On"
 
-	filter "configurations:Dist"
+	filter "configurations:dist"
 		defines "DIST"
 		optimize "On"

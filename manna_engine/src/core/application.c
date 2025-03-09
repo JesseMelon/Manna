@@ -5,6 +5,7 @@
 #include "core/memory.h"
 #include "core/event.h"
 #include "api_types.h"
+#include "core/clock.h"
 
 typedef struct application_state {
 	game* game_instance;
@@ -13,6 +14,7 @@ typedef struct application_state {
 	platform_state platform;
 	i16 width;
 	i16 height;
+    clock clock;
 	f64 last_time;
 } application_state;
 
@@ -78,25 +80,55 @@ b8 create_application(game* game_instance) {
 }
 
 b8 run_application() {
+    start_clock(&app_state.clock);
+    update_clock(&app_state.clock);
+    app_state.last_time = app_state.clock.elapsed;
+    f64 uptime = 0;
+    u8 frame_count = 0;
+    f64 target_frame_seconds = 1.0f / 60;
+
 	LOG_INFO(get_memory_usage());
 
 	while (app_state.is_running) {
 		if (!platform_get_messages(&app_state.platform)) return FALSE;
 
 		if (!app_state.is_suspended) {
-			if (!app_state.game_instance->update(app_state.game_instance, (f32)0.0)) {
+
+            update_clock(&app_state.clock);
+            f64 current_time = app_state.clock.elapsed;
+            f64 delta = (current_time - app_state.last_time);
+            f64 frame_start_time = platform_get_time();   
+
+			if (!app_state.game_instance->update(app_state.game_instance, (f32)delta)) {
 				LOG_FATAL("Failed to update game.");
 				app_state.is_running = FALSE;
 				break;
 			}
 
-			if (!app_state.game_instance->render(app_state.game_instance, (f32)0.0)) {
+			if (!app_state.game_instance->render(app_state.game_instance, (f32)delta)) {
 				LOG_FATAL("Failed to render game.");
 				app_state.is_running = FALSE;
 				break;
 			}
-            //NOTE: things which rely on the state of input should be before the update input, update input sets up next frame;
-            update_input(0);
+
+            f64 frame_end_time = platform_get_time();
+            f64 frame_elapsed_time = frame_end_time - frame_start_time;
+            uptime += frame_elapsed_time;
+            f64 remaining_seconds = target_frame_seconds - frame_elapsed_time;
+
+            if (remaining_seconds > 0) {
+                u64 remaining_ms = (remaining_seconds * 1000);
+                b8 limit_frames = FALSE;
+                if (remaining_ms > 0 && limit_frames) {
+                    platform_sleep(remaining_ms - 1);
+                }
+                frame_count++;
+            }
+
+            //NOTE: things which rely on the state of input should be before the update input, update input sets up next frame.
+            update_input(delta);
+
+            app_state.last_time = current_time; //update last frame time.
 		}
 	}
 	app_state.is_running = FALSE;

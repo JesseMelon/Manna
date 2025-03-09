@@ -8,6 +8,7 @@ typedef enum memory_tag {
     MEMORY_TAG_DARRAY,
     MEMORY_TAG_EDITOR,
     MEMORY_TAG_STRING,
+    MEMORY_TAG_RENDERER,
 	MEMORY_TAG_COUNT
 } memory_tag;
 

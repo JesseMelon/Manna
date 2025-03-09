@@ -9,13 +9,8 @@
 		{
 			"label": "Clean",
 			"type": "shell",
-			"command": "rm ${fileBasenameNoExtension}",
+			"command": "make clean",
 		},
-		{
-			"label": "Generate Projects",
-			"type": "shell",
-			"command": "./thirdparty/bin/premake5/linux/premake5",
-		}
 	]
 
 }
