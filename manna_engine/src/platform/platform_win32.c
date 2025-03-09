@@ -234,7 +234,7 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP: {
 			b8 pressed = message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN;
-			mouse_buttons button = MB_COUNT;
+			mouse_button button = MB_COUNT;
 			switch (message) {
 			case WM_LBUTTONDOWN:
 			case WM_LBUTTONUP:

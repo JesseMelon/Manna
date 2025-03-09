@@ -2,12 +2,12 @@
 
 #include "defines.h"
 
-typedef enum mouse_buttons {
+typedef enum mouse_button {
     MB_LEFT,
     MB_MIDDLE,
     MB_RIGHT,
     MB_COUNT
-} mouse_buttons;
+} mouse_button;
 
 #define DEFINE_KEY(name, code) KEY_##name = code
 
@@ -155,13 +155,13 @@ MANNA_API b8 was_key_up(keys key);
 
 void process_key(keys key, b8 pressed);
 
-MANNA_API b8 is_mouse_button_down(mouse_buttons button);
-MANNA_API b8 is_mouse_button_up(mouse_buttons button);
-MANNA_API b8 was_mouse_button_down(mouse_buttons button);
-MANNA_API b8 was_mouse_button_up(mouse_buttons button);
+MANNA_API b8 is_mouse_button_down(mouse_button button);
+MANNA_API b8 is_mouse_button_up(mouse_button button);
+MANNA_API b8 was_mouse_button_down(mouse_button button);
+MANNA_API b8 was_mouse_button_up(mouse_button button);
 MANNA_API void get_mouse_position(i32* x, i32* y);
 MANNA_API void get_previous_mouse_position(i32* x, i32* y);
 
-void process_mouse_button(mouse_buttons button, b8 pressed);
+void process_mouse_button(mouse_button button, b8 pressed);
 void process_mouse_move(i16 x, i16 y);
 void process_mouse_wheel(i8 z_delta);

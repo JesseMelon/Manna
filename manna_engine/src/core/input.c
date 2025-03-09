@@ -52,7 +52,7 @@ void process_key(keys key, b8 pressed) {
     }
 }
 
-void process_mouse_button(mouse_buttons button, b8 pressed) {
+void process_mouse_button(mouse_button button, b8 pressed) {
     if (state.mouse_current.buttons[button] != pressed) {
         state.mouse_current.buttons[button] = pressed;
         event_data event_data;
@@ -108,28 +108,28 @@ b8 was_key_up(keys key) {
     return state.keyboard_previous.keys[key] == TRUE;
 }
 
-b8 is_mouse_button_down(mouse_buttons button) {
+b8 is_mouse_button_down(mouse_button button) {
     if (!initialized) {
         return FALSE;
     }
     return state.mouse_current.buttons[button] == TRUE;
 }
 
-b8 is_mouse_button_up(mouse_buttons button) {
+b8 is_mouse_button_up(mouse_button button) {
     if (!initialized) {
         return TRUE;
     }
     return state.mouse_current.buttons[button] == FALSE;
 }
 
-b8 was_mouse_button_down(mouse_buttons button) {
+b8 was_mouse_button_down(mouse_button button) {
     if (!initialized) {
         return FALSE;
     }
     return state.mouse_previous.buttons[button] == TRUE;
 }
 
-b8 was_mouse_button_up(mouse_buttons button) {
+b8 was_mouse_button_up(mouse_button button) {
     if (!initialized) {
         return TRUE;
     }

@@ -1,6 +1,7 @@
 #include "memory.h"
 #include "core/logger.h"
 #include "platform/platform.h"
+#include "core/mstring.h"
 
 //TODO not string.h
 #define _POSIX_C_SOURCE 200809L
@@ -15,7 +16,8 @@ struct memory_stats {
 static const char* memory_tag_strings[MEMORY_TAG_COUNT] = {
 	"UNKNOWN",
     "DARRAY",
-    "EDITOR"
+    "EDITOR",
+    "STRING"
 };
 
 static struct memory_stats stats;
@@ -89,6 +91,6 @@ char* get_memory_usage() {
 		i32 len = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
 		offset += len;
 	}
-	char* out_string = strdup(buffer);
+	char* out_string = duplicate_string(buffer);
 	return out_string; //free this
 }
