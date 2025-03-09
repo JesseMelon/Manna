@@ -7,6 +7,9 @@
 #include "api_types.h"
 #include "core/clock.h"
 
+#include "renderer/renderer_frontend.h"
+#include "renderer/renderer_types.h"
+
 typedef struct application_state {
 	game* game_instance;
 	b8 is_running;
@@ -67,6 +70,11 @@ b8 create_application(game* game_instance) {
 		return FALSE;
 	}
 
+    if (!init_renderer(game_instance->app_config.title, &app_state.platform)) {
+        LOG_FATAL("Failed to initialize renderer.");
+        return FALSE;
+    }
+
 	//initialize game
 	if (!app_state.game_instance->initialize(app_state.game_instance)) {
 		LOG_FATAL("Failed to initialize game.");
@@ -82,6 +90,7 @@ b8 create_application(game* game_instance) {
 b8 run_application() {
     start_clock(&app_state.clock);
     update_clock(&app_state.clock);
+
     app_state.last_time = app_state.clock.elapsed;
     f64 uptime = 0;
     u8 frame_count = 0;
@@ -110,6 +119,11 @@ b8 run_application() {
 				app_state.is_running = FALSE;
 				break;
 			}
+            
+            //TODO: render data
+            render_data render_data;
+            render_data.delta_time = delta;
+            draw_frame(&render_data);
 
             f64 frame_end_time = platform_get_time();
             f64 frame_elapsed_time = frame_end_time - frame_start_time;
@@ -138,6 +152,7 @@ b8 run_application() {
     ignore_event(EVENT_KEY_RELEASED, 0, application_on_key);
     shutdown_events();
     shutdown_input();
+    shutdown_renderer();
 
 	shutdown_platform(&app_state.platform);
 
@@ -147,7 +162,7 @@ b8 run_application() {
 b8 application_on_event(u16 event_id, void* sender, void* listener_instance, event_data data) {
     switch (event_id) {
         case EVENT_APPLICATION_QUIT:
-            LOG_INFO("Appplication Quit event received, shutting down.\n");
+            LOG_INFO("Application Quit event received, shutting down.\n");
             app_state.is_running = FALSE;
             return TRUE;
     }
