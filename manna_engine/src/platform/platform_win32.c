@@ -199,7 +199,7 @@ void vulkan_platform_get_required_extension_names(const char ***names_darray) {
     darray_push(*names_darray, &"VK_KHR_win32_surface");
 }
 
-b8 create_vulkan_surface(platform_state* platform_state, vulkan_context* context) {
+b8 platform_create_vulkan_surface(platform_state* platform_state, vulkan_context* context) {
     internal_state *state = (internal_state *)platform_state->internal_state;
 
     VkWin32SurfaceCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR};

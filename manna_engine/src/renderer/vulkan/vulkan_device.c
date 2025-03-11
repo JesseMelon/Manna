@@ -86,7 +86,7 @@ b8 physical_device_meets_requirements(
         }
         if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT) {
             //take the index if it is current lowest, landing on designated transfer queue by the end
-            if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT) {
+            if (current_transfer_score <= min_transfer_score) {
                 min_transfer_score = current_transfer_score;
                 out_queue_info->transfer_family_index = i;
             }
@@ -98,13 +98,12 @@ b8 physical_device_meets_requirements(
             out_queue_info->present_family_index = i;
         }
     }
-
-    LOG_INFO("      %d |      %d |      %d | %s",
-             out_queue_info->graphics_family_index != -1,
-             out_queue_info->present_family_index != -1,
-             out_queue_info->compute_family_index != -1,
-             out_queue_info->transfer_family_index != -1,
-             properties->deviceName);
+    LOG_INFO("       %d |       %d |       %d |        %d | %s ",
+        out_queue_info->graphics_family_index != -1,
+        out_queue_info->present_family_index != -1,
+        out_queue_info->compute_family_index != -1,
+        out_queue_info->transfer_family_index != -1,
+        properties->deviceName);
     if (
         (!requirements->graphics || out_queue_info->graphics_family_index != -1) &&
         (!requirements->present || out_queue_info->present_family_index != -1) &&
