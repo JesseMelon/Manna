@@ -13,3 +13,6 @@ char* duplicate_string(const char* str) {
     return copy;
 }
 
+b8 compare_strings(const char *str0, const char *str1) {
+    return strcmp(str0, str1) == 0;
+}
