@@ -5,13 +5,14 @@
 #include <vulkan/vulkan.h>
 #include "vulkan/vulkan_core.h"
 
-//FIXME: this will compile away any vulcan calls if asserts are off
-#define VK_CHECK(expression)                \
-    {                                       \
-        M_ASSERT(expression == VK_SUCCESS, "");       \
-    }
+#define VK_CHECK(expression)                            \
+    do {                                                \
+        VkResult result = expression;                   \
+        M_ASSERT(result == VK_SUCCESS, "");             \
+        (void)result;                                   \
+    } while(0)
 
-
+//system swapchain capabilities
 typedef struct vulkan_swapchain_support_info {
     VkSurfaceCapabilitiesKHR capabilities;
     u32 format_count;
@@ -20,19 +21,28 @@ typedef struct vulkan_swapchain_support_info {
     VkPresentModeKHR* present_modes;
 } vulkan_swapchain_support_info;
 
+//overall system capabilities
 typedef struct vulkan_device {
     VkPhysicalDevice physical_device;
     VkDevice logical_device;
     vulkan_swapchain_support_info swapchain_support;
+
+    //indices of queues
     i32 graphics_queue_index;
     i32 present_queue_index;
     i32 transfer_queue_index;
+
+    //handles to queues themselves
+    VkQueue graphics_queue;
+    VkQueue present_queue;
+    VkQueue transfer_queue;
 
     VkPhysicalDeviceProperties properties;
     VkPhysicalDeviceFeatures features;
     VkPhysicalDeviceMemoryProperties memory;
 } vulkan_device;
 
+//a collection of handles to resources constituting our rendering context
 typedef struct vulkan_context {
     VkInstance instance;
     VkAllocationCallbacks* allocator;
