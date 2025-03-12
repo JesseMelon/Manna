@@ -270,11 +270,12 @@ b8 create_vulkan_device(vulkan_context* context) {
     //based on the queue indices we gathered from select physical device, we determine the overlap for how many queue families we need
     b8 present_shares_graphics_queue = context->device.graphics_queue_index == context->device.present_queue_index;
     b8 transfer_shares_graphics_queue = context->device.graphics_queue_index == context->device.transfer_queue_index;
+    b8 present_shares_transfer_queue = context->device.present_queue_index == context->device.transfer_queue_index;
     u32 index_count = 1;
     if (!present_shares_graphics_queue) {
         index_count++;
     }
-    if (!transfer_shares_graphics_queue) {
+    if (!transfer_shares_graphics_queue && !present_shares_transfer_queue) {
         index_count++;
     }
 
@@ -285,11 +286,13 @@ b8 create_vulkan_device(vulkan_context* context) {
     if (!present_shares_graphics_queue) {
         indices[index++] = context->device.present_queue_index;
     }
-    if (!transfer_shares_graphics_queue) {
+    if (!transfer_shares_graphics_queue && !present_shares_transfer_queue) {
         indices[index++] = context->device.transfer_queue_index;
     }
     
+
     //create and fill out queue create info structs. think of queues as workers, we set up 2 graphics queues to render a frame alongside the next
+    const f32 queue_priority[3] = {1.0f, 1.0f, 1.0f};
     VkDeviceQueueCreateInfo queue_create_infos[index_count];
     const f32 queue_priorities[2] = {1.0f, 1.0f};
     for (u32 i = 0; i < index_count; ++i) {
@@ -302,7 +305,6 @@ b8 create_vulkan_device(vulkan_context* context) {
         queue_create_infos[i].flags = 0;
         queue_create_infos[i].pNext = 0;
         queue_create_infos[i].pQueuePriorities = queue_priorities;
-        LOG_DEBUG("%f", queue_create_infos[i].pQueuePriorities[0]);
     }
 
     //TODO: configurable
@@ -339,6 +341,7 @@ b8 create_vulkan_device(vulkan_context* context) {
 }
 
 void destroy_vulkan_device(vulkan_context* context) {
+
 
     //release queue handles
     context->device.graphics_queue = 0;

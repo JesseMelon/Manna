@@ -2,6 +2,7 @@
 #include "core/asserts.h"
 #include "core/logger.h"
 #include "defines.h"
+#include "vulkan/vulkan_core.h"
 #include "vulkan_device.h"
 #include "vulkan_types.h"
 #include "core/mstring.h"
@@ -153,6 +154,15 @@ b8 init_vulkan_renderer_backend(renderer_backend *backend, const char *applicati
 
 void shutdown_vulkan_renderer_backend(renderer_backend *backend) {
     
+    LOG_DEBUG("Destroying vulkan device");
+    destroy_vulkan_device(&context);
+
+    LOG_DEBUG("Destroying vulkan surface");
+    if (context.surface) {
+        vkDestroySurfaceKHR(context.instance, context.surface, context.allocator);
+        context.surface = 0;
+    }
+
     LOG_DEBUG("Destroying vulkan debugger");
     if(context.debug_messenger) {
         PFN_vkDestroyDebugUtilsMessengerEXT func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(context.instance, "vkDestroyDebugUtilsMessengerEXT");
