@@ -6,7 +6,6 @@
 #include "defines.h"
 #include "renderer/vulkan/vulkan_types.h"
 #include "vulkan/vulkan_core.h"
-#include <strings.h>
 
 typedef struct vulkan_physical_device_requirements {
     b8 graphics;
@@ -292,6 +291,7 @@ b8 create_vulkan_device(vulkan_context* context) {
     
     //create and fill out queue create info structs. think of queues as workers, we set up 2 graphics queues to render a frame alongside the next
     VkDeviceQueueCreateInfo queue_create_infos[index_count];
+    const f32 queue_priorities[2] = {1.0f, 1.0f};
     for (u32 i = 0; i < index_count; ++i) {
         queue_create_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queue_create_infos[i].queueFamilyIndex = indices[i];
@@ -301,8 +301,8 @@ b8 create_vulkan_device(vulkan_context* context) {
         }
         queue_create_infos[i].flags = 0;
         queue_create_infos[i].pNext = 0;
-        f32 queue_priority = 1.0f;
-        queue_create_infos[i].pQueuePriorities = &queue_priority;
+        queue_create_infos[i].pQueuePriorities = queue_priorities;
+        LOG_DEBUG("%f", queue_create_infos[i].pQueuePriorities[0]);
     }
 
     //TODO: configurable
