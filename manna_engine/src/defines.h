@@ -50,3 +50,5 @@ STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
         #define MANNA_API 
     #endif
 #endif
+
+#define CLAMP(value, min, max) (value <= min) ? min : (value >= max) ? max : value;

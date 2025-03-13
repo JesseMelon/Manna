@@ -373,3 +373,24 @@ void destroy_vulkan_device(vulkan_context* context) {
     context->device.present_queue_index = -1;
     context->device.transfer_queue_index = -1;
 }
+
+b8 vulkan_device_detect_depth_format(vulkan_device *device) {
+    const u64 candidates_count = 3;
+    //revisit candidates when adding stencil buffer
+    VkFormat candidates[3] = {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT};
+    
+    u32 flags = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT; //depth and stencil buffers combined
+
+    for (u64 i = 0; i < candidates_count; ++i) {
+        VkFormatProperties properties;
+        vkGetPhysicalDeviceFormatProperties(device->physical_device, candidates[i], &properties);
+        if ((properties.linearTilingFeatures & flags) == flags) {
+            device->depth_format = candidates[i];
+            return TRUE;
+        } else if ((properties.optimalTilingFeatures & flags) == flags) {
+            device->depth_format = candidates[i];
+            return TRUE;
+        }
+    }
+    return FALSE;
+}

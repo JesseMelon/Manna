@@ -1,13 +1,12 @@
 #include "vulkan_backend.h"
-#include "core/asserts.h"
-#include "core/logger.h"
-#include "defines.h"
-#include "vulkan/vulkan_core.h"
-#include "vulkan_device.h"
+#include "renderer/vulkan/vulkan_swapchain.h"
 #include "vulkan_types.h"
+#include "vulkan_platform.h"
+#include "vulkan_device.h"
+#include "core/logger.h"
 #include "core/mstring.h"
 #include "containers/darray.h"
-#include "vulkan_platform.h"
+#include "platform/platform.h"
 
 static vulkan_context context;
 
@@ -35,8 +34,23 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
     return VK_FALSE;
 }
 
+i32 find_memory_index(u32 type_filter, u32 property_flags) {
+    VkPhysicalDeviceMemoryProperties memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(context.device.physical_device, &memory_properties);
+
+    for (u32 i = 0; i < memory_properties.memoryTypeCount; ++i) {
+        if (type_filter & (i << i) && (memory_properties.memoryTypes[i].propertyFlags & property_flags) == property_flags) {
+            return i;
+        }
+    }
+    LOG_WARN("Unable to find memory type");
+    return -1;
+}
+
 b8 init_vulkan_renderer_backend(renderer_backend *backend, const char *application_name, struct platform_state *platform_state) {
     
+    context.find_memory_index = find_memory_index;
+
     //TODO: allocator
     context.allocator = 0;
 
@@ -142,17 +156,21 @@ b8 init_vulkan_renderer_backend(renderer_backend *backend, const char *applicati
     }
     LOG_DEBUG("Vulkan surface created");
     
-    //create device from context
+    //create device
     if (!create_vulkan_device(&context)) {
         LOG_ERROR("Failed to create device");
         return FALSE;
     }
+
+    //create swapchain
+    create_vulkan_swapchain(&context, context.framebuffer_width, context.framebuffer_height, &context.swapchain);
 
     LOG_INFO("Vulkan renderer initialized");
     return TRUE;
 }
 
 void shutdown_vulkan_renderer_backend(renderer_backend *backend) {
+    destroy_vulkan_swapchain(&context, &context.swapchain);
     
     LOG_DEBUG("Destroying vulkan device");
     destroy_vulkan_device(&context);
