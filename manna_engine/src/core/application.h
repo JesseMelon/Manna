@@ -15,3 +15,5 @@ typedef struct application_create_info {
 MANNA_API b8 create_application(struct game* game_instance);
 
 MANNA_API b8 run_application();
+
+void application_get_framebuffer_size(u32* width, u32* height);

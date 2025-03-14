@@ -7,6 +7,7 @@
 #include "containers/darray.h"
 #include "renderer/vulkan/vulkan_platform.h"
 #include "renderer/vulkan/vulkan_types.h"
+#include "core/event.h"
 
 #include <windows.h>
 #include <windowsx.h> //for input 
@@ -220,7 +221,8 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
 		case WM_ERASEBKGND:
 			return 1;	//handle erasing in application
 		case WM_CLOSE:
-			//TODO: shutdown event launch
+			event_context data = {};
+            trigger_event(EVENT_APPLICATION_QUIT, 0, data);
 			return 0;
 		case WM_DESTROY:
 			PostQuitMessage(0);

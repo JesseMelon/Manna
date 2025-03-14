@@ -139,6 +139,8 @@ void destroy(vulkan_context* context, vulkan_swapchain* swapchain) {
     for (u32 i = 0; i < swapchain->image_count; ++i) {
         vkDestroyImageView(context->device.logical_device, swapchain->views[i], context->allocator);
     }
+
+    vkDestroySwapchainKHR(context->device.logical_device, swapchain->handle, context->allocator);
 }
 
 void create_vulkan_swapchain(vulkan_context *context, u32 width, u32 height, vulkan_swapchain *out_swapchain) {
@@ -183,4 +185,7 @@ void vulkan_swapchain_present_image(vulkan_context *context, vulkan_swapchain *s
     } else if (result != VK_SUCCESS) {
         LOG_FATAL("Failed to present swapchain image");
     }
+
+    //update the current frame
+    context->current_frame = (context->current_frame + 1) % swapchain->max_frames_in_flight;
 }

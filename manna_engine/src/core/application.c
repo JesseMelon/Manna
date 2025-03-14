@@ -159,6 +159,11 @@ b8 run_application() {
 	return TRUE;
 }
 
+void application_get_framebuffer_size(u32 *width, u32 *height) {
+    *width = app_state.width;
+    *height = app_state.height;
+}
+
 b8 application_on_event(u16 event_id, void* sender, void* listener_instance, event_data data) {
     switch (event_id) {
         case EVENT_APPLICATION_QUIT:

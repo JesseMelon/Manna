@@ -329,13 +329,21 @@ b8 create_vulkan_device(vulkan_context* context) {
         &device_create_info, 
         context->allocator, 
         &context->device.logical_device));
-    LOG_INFO("Logical device created");
+    LOG_INFO("Logical device created.");
 
     //get handles to queues
     vkGetDeviceQueue(context->device.logical_device, context->device.graphics_queue_index, 0, &context->device.graphics_queue);
     vkGetDeviceQueue(context->device.logical_device, context->device.present_queue_index, 0, &context->device.present_queue);
     vkGetDeviceQueue(context->device.logical_device, context->device.transfer_queue_index, 0, &context->device.transfer_queue);
-    LOG_INFO("Queues obtained");
+    LOG_INFO("Queues obtained.");
+
+    //create command pool
+    VkCommandPoolCreateInfo pool_create_info = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
+    pool_create_info.queueFamilyIndex = context->device.graphics_queue_index;
+    pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    VK_CHECK(vkCreateCommandPool(context->device.logical_device, &pool_create_info, context->allocator, &context->device.graphics_command_pool));
+
+    LOG_INFO("Graphics command pool created.");
 
     return TRUE;
 }
@@ -348,15 +356,18 @@ void destroy_vulkan_device(vulkan_context* context) {
     context->device.present_queue = 0;
     context->device.transfer_queue = 0;
 
+    LOG_INFO("Destroying command pools.");
+    vkDestroyCommandPool(context->device.logical_device, context->device.graphics_command_pool, context->allocator);
+
     //destroy logical device
-    LOG_INFO("Destroying logical device");
+    LOG_INFO("Destroying logical device.");
     if (context->device.logical_device) {
         vkDestroyDevice(context->device.logical_device, context->allocator);
         context->device.logical_device = 0;
     }
     
     //destroy physical device
-    LOG_INFO("Releasing physical device resources");
+    LOG_INFO("Releasing physical device resources.");
     context->device.physical_device = 0;
     if (context->device.swapchain_support.formats) {
         m_free(context->device.swapchain_support.formats, sizeof(VkSurfaceFormatKHR) * context->device.swapchain_support.format_count, MEMORY_TAG_RENDERER);
