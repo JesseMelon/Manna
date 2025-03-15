@@ -52,3 +52,11 @@ STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
 #endif
 
 #define CLAMP(value, min, max) (value <= min) ? min : (value >= max) ? max : value;
+
+#ifdef M_PLATFORM_WINDOWS
+#define INLINE __forceinline
+#define NOINLINE __declspec(noinline)
+#else
+#define INLINE static inline
+#define NOINLINE
+#endif

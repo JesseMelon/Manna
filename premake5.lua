@@ -66,7 +66,8 @@ project "manna_engine"
             "xcb",
             "X11",
             "X11-xcb",
-            "xkbcommon"
+            "xkbcommon",
+            "m"
 		}
         linkoptions {
             ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
@@ -85,7 +86,8 @@ project "manna_engine"
             "xcb",
             "X11",
             "X11-xcb",
-            "xkbcommon"
+            "xkbcommon",
+            "m"
         }
         linkoptions {
             ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or ""
