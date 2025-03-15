@@ -221,15 +221,15 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
 		case WM_ERASEBKGND:
 			return 1;	//handle erasing in application
 		case WM_CLOSE:
-			event_context data = {};
+		event_data data = {};
             trigger_event(EVENT_APPLICATION_QUIT, 0, data);
 			return 0;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
 		case WM_SIZE: {
-			//rect r;
-			getclientrect(window, &r);
+			RECT r;
+			GetClientRect(window, &r);
 			u32 width = r.right - r.left;
 			u32 height = r.bottom - r.top;
             

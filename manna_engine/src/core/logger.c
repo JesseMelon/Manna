@@ -8,7 +8,7 @@
 #include <string.h>
 
 void report_assertion_fail(const char* file, int line, const char* expression, const char* message) {
-	m_log(LOG_LEVEL_FATAL, "Assertion Failed: %s File: %s Line: %d Message: %s\n", expression, file, line, message);
+	m_log(LOG_LEVEL_ERROR, "Assertion Failed: %s File: %s Line: %d Message: %s\n", expression, file, line, message);
 }
 b8 init_logger() {
 	//TODO create log file
