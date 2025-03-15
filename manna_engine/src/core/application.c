@@ -24,8 +24,10 @@ typedef struct application_state {
 static b8 is_initialized = FALSE;
 static application_state app_state;
 
+//event handlers
 b8 application_on_event(u16 event_id, void* sender, void* listener_instance, event_data data);
 b8 application_on_key(u16 event_id, void* sender, void* listener_instance, event_data data);
+b8 application_on_resized(u16 event_id, void* sender, void* listener_instance, event_data);
 
 b8 create_application(game* game_instance) {
 	if (is_initialized) {
@@ -40,7 +42,7 @@ b8 create_application(game* game_instance) {
     init_input();
 
 	//TODO: remove this
-	LOG_FATAL("Fatal! %f:", 1.0);
+	//LOG_FATAL("Fatal! %f:", 1.0);
 	LOG_ERROR("Error!");
 	LOG_WARN("Warn!");
 	LOG_DEBUG("Debug!");
@@ -58,6 +60,7 @@ b8 create_application(game* game_instance) {
     listen_to_event(EVENT_APPLICATION_QUIT, 0, application_on_event);
     listen_to_event(EVENT_KEY_PRESSED, 0, application_on_key);
     listen_to_event(EVENT_KEY_RELEASED, 0, application_on_key);
+    listen_to_event(EVENT_WINDOW_RESIZED, 0, application_on_resized);
 
 	if (!platform_startup(
 		&app_state.platform,
@@ -193,6 +196,34 @@ b8 application_on_key(u16 event_id, void* sender, void* listener_instance, event
             LOG_DEBUG("B key release recognized");
         } else {
             LOG_DEBUG("'%c' key released in window", key);
+        }
+    }
+    return FALSE;
+}
+
+b8 application_on_resized(u16 event_id, void* sender, void* listener_instance, event_data data) {
+    if (event_id == EVENT_WINDOW_RESIZED) {
+        u16 width = data.u16[0];
+        u16 height = data.u16[1];
+
+        if (width != app_state.width || height != app_state.height) {
+            app_state.width = width;
+            app_state.height = height;
+            LOG_DEBUG("Window resize: %i, %i", width, height);
+
+            if (width == 0 || height == 0) {
+                LOG_INFO("Window minimized, suspending.");
+                app_state.is_suspended = TRUE;
+                return TRUE;
+            } else {
+                if (app_state.is_suspended) {
+                    LOG_INFO("Window restored, resuming application");
+                    app_state.is_suspended = FALSE;
+                }
+                app_state.game_instance->on_resize(app_state.game_instance, width, height);
+                //renderer
+                on_resized(width, height);
+            }
         }
     }
     return FALSE;

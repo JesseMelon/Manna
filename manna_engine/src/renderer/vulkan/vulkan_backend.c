@@ -3,6 +3,7 @@
 #include "core/memory.h"
 #include "renderer/vulkan/vulkan_command_buffer.h"
 #include "renderer/vulkan/vulkan_fence.h"
+#include "renderer/vulkan/vulkan_utils.h"
 #include "renderer/vulkan/vulkan_framebuffer.h"
 #include "renderer/vulkan/vulkan_renderpass.h"
 #include "renderer/vulkan/vulkan_swapchain.h"
@@ -72,6 +73,67 @@ void regenerate_framebuffers(renderer_backend* backend, vulkan_swapchain* swapch
         VkImageView attachments[] = {swapchain->views[i], swapchain->depth_attachment.view};
         create_vulkan_framebuffer(&context, renderpass, context.framebuffer_width, context.framebuffer_height, attachment_count, attachments, &context.swapchain.framebuffers[i]);
     }
+}
+
+b8 recreate_swapchain(renderer_backend* backend) {
+    //check to see if already recreating
+    if (context.recreating_swapchain) {
+        LOG_DEBUG("recreating_swapchain called while already recreating");
+        return FALSE;
+    }
+
+    //detect if window is too small
+    if (context.framebuffer_width == 0 || context.framebuffer_height == 0) {
+        LOG_DEBUG("recreate_swapchain called when window is < 1 in a dimension");
+        return FALSE;
+    }
+
+    context.recreating_swapchain = TRUE;
+
+    //wait for things to finish
+    vkDeviceWaitIdle(context.device.logical_device);
+    
+    //clear images of wrong dimension
+    for (u32 i = 0; i < context.swapchain.image_count; ++i) {
+        context.images_in_flight[i] = 0;
+    }
+
+    //requery swapchain support
+    vulkan_device_query_swapchain_support(context.device.physical_device, context.surface, &context.device.swapchain_support);
+    vulkan_device_detect_depth_format(&context.device);
+
+    recreate_vulkan_swapchain(&context, cached_framebuffer_width, cached_framebuffer_height, &context.swapchain);
+    
+    //sync framebuffer with cached sizes
+    context.framebuffer_width = cached_framebuffer_width;
+    context.framebuffer_height = cached_framebuffer_height;
+    context.main_renderpass.w = context.framebuffer_width;
+    context.main_renderpass.h = context.framebuffer_height;
+    cached_framebuffer_width = 0;
+    cached_framebuffer_height = 0;
+
+    context.framebuffer_size_last_generation = context.framebuffer_size_generation;
+
+    for (u32 i = 0; i < context.swapchain.image_count; ++i) {
+        free_vulkan_command_buffer(&context, context.device.graphics_command_pool, &context.graphics_command_buffers[i]);
+    }
+    for (u32 i = 0; i < context.swapchain.image_count; ++i) {
+        destroy_vulkan_framebuffer(&context, &context.swapchain.framebuffers[i]);
+    }
+
+    context.main_renderpass.x = 0;
+    context.main_renderpass.y = 0;
+    context.main_renderpass.w = context.framebuffer_width;
+    context.main_renderpass.h = context.framebuffer_height;
+
+    regenerate_framebuffers(backend, &context.swapchain, &context.main_renderpass);
+
+    create_command_buffers(backend);
+
+    //signal done
+    context.recreating_swapchain = FALSE;
+
+    return TRUE;
 }
 
 i32 find_memory_index(u32 type_filter, u32 property_flags) {
@@ -305,13 +367,124 @@ void shutdown_vulkan_renderer_backend(renderer_backend *backend) {
 }
 
 void vulkan_renderer_backend_on_resize(renderer_backend *backend, u16 width, u16 height) {
+    cached_framebuffer_width = width;
+    cached_framebuffer_height = height;
+    context.framebuffer_size_generation++;
 
+    LOG_INFO("Vulkan renderer backend resized: w/h/gen: %i/%i/%llu", width, height, context.framebuffer_size_generation);
 }
 
 b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time) {
+
+    if (context.recreating_swapchain) {
+        VkResult result = vkDeviceWaitIdle(context.device.logical_device);
+        if (!vulkan_result_is_success(result)) {
+            LOG_ERROR("vulkan_renderer_backend_begin_frame vkDeviceWaitIdle (1) failed: %s", vulkan_result_string(result, TRUE));
+            return FALSE;
+        }
+        LOG_INFO("Recreating swapchain.");
+        return FALSE;
+    }
+
+    if (context.framebuffer_size_generation != context.framebuffer_size_last_generation) {
+        VkResult result = vkDeviceWaitIdle(context.device.logical_device);
+        if (!vulkan_result_is_success(result)) {
+            LOG_ERROR("vulkan_renderer_backend_begin_frame vkDeviceWaitIdle (2) failed: %s", vulkan_result_string(result, TRUE));
+            return FALSE;
+        }
+        if (!recreate_swapchain(backend)) {
+            return FALSE;
+        }
+
+        LOG_INFO("Resized");
+        return FALSE;
+    }
+
+    //wait for current frame to complete
+    if (!wait_for_vulkan_fence(&context, &context.in_flight_fences[context.current_frame], UINT64_MAX)) {
+        LOG_WARN("In-flight fence wait failure");
+        return FALSE;
+    }
+
+    //acquire next image from swapchain
+    if (!vulkan_swapchain_acquire_next_image_index(&context, &context.swapchain, UINT64_MAX, context.image_available_semaphores[context.current_frame], 0, &context.image_index)) {
+        return FALSE;   
+    }
+
+    vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
+    reset_vulkan_command_buffer(command_buffer);
+    begin_vulkan_command_buffer(command_buffer, FALSE, FALSE, FALSE);
+
+    //dynamic state, treating bottom left as 0,0 and depth from 0 to 1 consistent with opengl
+    VkViewport viewport;
+    viewport.x = 0.0f;
+    viewport.y = (f32)context.framebuffer_height;
+    viewport.width = (f32)context.framebuffer_width;
+    viewport.height = -(f32)context.framebuffer_height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    //Scissor to size of screen. could make smaller for demonstration 
+    VkRect2D scissor;
+    scissor.offset.x = scissor.offset.y = 0;
+    scissor.extent.width = context.framebuffer_width;
+    scissor.extent.height = context.framebuffer_height;
+
+    vkCmdSetViewport(command_buffer->handle, 0, 1, &viewport);
+    vkCmdSetScissor(command_buffer->handle, 0, 1, &scissor);
+
+    context.main_renderpass.w = context.framebuffer_width;
+    context.main_renderpass.h = context.framebuffer_height;
+
+    begin_vulkan_renderpass(command_buffer, &context.main_renderpass, context.swapchain.framebuffers[context.image_index].handle);
+
     return TRUE;
 }
 
 b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) {
+
+    vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
+
+    end_vulkan_renderpass(command_buffer, &context.main_renderpass);
+
+    end_vulkan_command_buffer(command_buffer);
+
+    if (context.images_in_flight[context.image_index] != VK_NULL_HANDLE) {
+        wait_for_vulkan_fence(&context, context.images_in_flight[context.image_index], UINT64_MAX);
+    }
+
+    //mark the image fence as in use
+    context.images_in_flight[context.image_index] = &context.in_flight_fences[context.current_frame];
+
+    //reset fence for the next frame
+    reset_vulkan_fence(&context, &context.in_flight_fences[context.current_frame]);
+
+    VkSubmitInfo submit_info = {VK_STRUCTURE_TYPE_SUBMIT_INFO};
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &command_buffer->handle;
+    //semaphores to be signalled when queue completes
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = &context.queue_complete_semaphores[context.current_frame];
+    //wait semaphore ensures operation cannot begin until the image is available
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = &context.image_available_semaphores[context.current_frame];
+    //each semaphore waits on the corresponding pipeline stage to complete.
+    //VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT prevents subsequent color attachment
+    //writes from executing until the semaphore signals
+    VkPipelineStageFlags flags[1] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    submit_info.pWaitDstStageMask = flags;
+
+    VkResult result = vkQueueSubmit(context.device.graphics_queue, 1, &submit_info, context.in_flight_fences[context.current_frame].handle);
+    if (result != VK_SUCCESS) {
+        LOG_ERROR("vkQueueSubmit failed with result: %s", vulkan_result_string(result, TRUE));
+        return FALSE;
+    }
+
+    submit_vulkan_command_buffer(command_buffer);
+    //queue submission done
+
+    //present
+    vulkan_swapchain_present_image(&context, &context.swapchain, context.device.graphics_queue, context.device.present_queue, context.queue_complete_semaphores[context.current_frame], context.image_index);
+
     return TRUE;
 }

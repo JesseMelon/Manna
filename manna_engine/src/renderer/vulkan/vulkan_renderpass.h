@@ -22,6 +22,6 @@ void create_vulkan_renderpass(vulkan_context* context, vulkan_renderpass* out_re
 
 void destroy_vulkan_renderpass(vulkan_context* context, vulkan_renderpass* renderpass);
 
-void vulkan_renderpass_begin(vulkan_command_buffer* command_buffer, vulkan_renderpass* renderpass, VkFramebuffer frame_buffer);
+void begin_vulkan_renderpass(vulkan_command_buffer* command_buffer, vulkan_renderpass* renderpass, VkFramebuffer frame_buffer);
 
-void vulkan_renderpass_end(vulkan_command_buffer* command_buffer, vulkan_renderpass* renderpass); 
+void end_vulkan_renderpass(vulkan_command_buffer* command_buffer, vulkan_renderpass* renderpass); 

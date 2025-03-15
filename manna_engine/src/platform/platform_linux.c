@@ -1,3 +1,4 @@
+#include "core/event.h"
 #include "platform/platform.h"
 #if M_PLATFORM_LINUX
 #include "containers/darray.h"
@@ -198,6 +199,12 @@ b8 platform_get_messages(platform_state *platform_state) {
             } break;
             case XCB_CONFIGURE_NOTIFY: {
                 //window resize
+                xcb_configure_notify_event_t* configure_event = (xcb_configure_notify_event_t*)event;
+                event_data data;
+                data.u16[0] = configure_event->width;
+                data.u16[1] = configure_event->height;
+                trigger_event(EVENT_WINDOW_RESIZED, 0, data);
+
             } break;
             case XCB_CLIENT_MESSAGE: {
                 client_message = (xcb_client_message_event_t*)event;

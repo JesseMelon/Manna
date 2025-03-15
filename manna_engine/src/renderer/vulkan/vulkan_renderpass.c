@@ -3,6 +3,17 @@
 
 void create_vulkan_renderpass(vulkan_context *context, vulkan_renderpass *out_renderpass, f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a, f32 depth, u32 stencil) {
 
+    out_renderpass->x = x;
+    out_renderpass->y = y;
+    out_renderpass->w = w;
+    out_renderpass->h = h;
+    out_renderpass->r = r;
+    out_renderpass->g = g;
+    out_renderpass->b = b;
+    out_renderpass->a = a;
+    out_renderpass->depth = depth;
+    out_renderpass->stencil = stencil;
+
     //main subpass
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -95,7 +106,7 @@ void destroy_vulkan_renderpass(vulkan_context *context, vulkan_renderpass *rende
     }
 }
 
-void vulkan_renderpass_begin(vulkan_command_buffer *command_buffer, vulkan_renderpass *renderpass, VkFramebuffer frame_buffer) {
+void begin_vulkan_renderpass(vulkan_command_buffer *command_buffer, vulkan_renderpass *renderpass, VkFramebuffer frame_buffer) {
     VkRenderPassBeginInfo begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
     begin_info.renderPass = renderpass->handle;
     begin_info.framebuffer = frame_buffer;
@@ -120,7 +131,7 @@ void vulkan_renderpass_begin(vulkan_command_buffer *command_buffer, vulkan_rende
     command_buffer->state = COMMAND_BUFFER_IN_RENDER_PASS;
 }
 
-void vulkan_renderpass_end(vulkan_command_buffer *command_buffer, vulkan_renderpass *renderpass) {
+void end_vulkan_renderpass(vulkan_command_buffer *command_buffer, vulkan_renderpass *renderpass) {
     vkCmdEndRenderPass(command_buffer->handle);
     command_buffer->state = COMMAND_BUFFER_RECORDING;
 }

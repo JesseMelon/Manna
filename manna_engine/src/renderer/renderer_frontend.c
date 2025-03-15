@@ -35,6 +35,14 @@ b8 end_frame(f32 delta_time) {
     return result;
 }
 
+void on_resized(u16 width, u16 height) {
+    if (backend) {
+        backend->resize(backend, width, height);
+    } else {
+        LOG_WARN("renderer backend does not exist to accept resize");
+    }
+}
+
 b8 draw_frame(render_data *data) {
     if (begin_frame(data->delta_time)) {
         b8 result = end_frame(data->delta_time);

@@ -133,6 +133,7 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
 }
 
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain) {
+    vkDeviceWaitIdle(context->device.logical_device);
     destroy_vulkan_image(context, &swapchain->depth_attachment);
 
     //only destroy views, since only they were created in create
