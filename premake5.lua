@@ -41,6 +41,7 @@ project "manna_engine"
 		defines {
 			"M_PLATFORM_WINDOWS",
 			"M_DLL_EXPORT"
+			"RAYTRACING"
 		}
         libdirs {
             os.getenv("VULKAN_SDK") .. "/Lib" or ""
