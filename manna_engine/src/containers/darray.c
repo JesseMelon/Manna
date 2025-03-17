@@ -1,6 +1,6 @@
 #include "containers/darray.h"
 #include "core/logger.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 
 //TODO: some of these can be optimized to not regenerate the pointer to darray
 

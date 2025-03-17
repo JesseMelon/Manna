@@ -2,7 +2,7 @@
 
 #include "../defines.h"
 
-struct game;
+struct manna_app;
 
 typedef struct application_create_info {
 	i16 x;
@@ -12,7 +12,7 @@ typedef struct application_create_info {
 	char* title;
 } application_create_info;
 
-MANNA_API b8 create_application(struct game* game_instance);
+MANNA_API b8 create_application(struct manna_app* app_instance);
 
 MANNA_API b8 run_application();
 

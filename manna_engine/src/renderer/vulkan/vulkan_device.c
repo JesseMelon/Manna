@@ -1,7 +1,7 @@
 #include "vulkan_device.h"
 #include "core/logger.h"
 #include "core/mstring.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "containers/darray.h"
 #include "defines.h"
 #include "renderer/vulkan/vulkan_types.h"
@@ -67,7 +67,7 @@ b8 physical_device_meets_requirements(
 
     u32 queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, 0);
-    VkQueueFamilyProperties queue_families[queue_family_count];
+    VkQueueFamilyProperties queue_families[32];
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, queue_families);
 
     //see what each queue supports
@@ -172,8 +172,9 @@ b8 select_physical_device(vulkan_context* context) {
         LOG_FATAL("No devices support vulkan");
         return FALSE;
     }
-
-    VkPhysicalDevice physical_devices[physical_device_count];
+    
+#define MAX_DEVICE_COUNT 32
+    VkPhysicalDevice physical_devices[MAX_DEVICE_COUNT];
     VK_CHECK(vkEnumeratePhysicalDevices(context->instance, &physical_device_count, physical_devices));
     for (u32 i = 0; i < physical_device_count; ++i) {
         VkPhysicalDeviceProperties properties;
@@ -280,7 +281,7 @@ b8 create_vulkan_device(vulkan_context* context) {
     }
 
     //now with index count determined, size the queue indices array and fill it in
-    u32 indices[index_count];
+    u32 indices[32];
     u8 index = 0;
     indices[index++] = context->device.graphics_queue_index;
     if (!present_shares_graphics_queue) {
@@ -293,7 +294,7 @@ b8 create_vulkan_device(vulkan_context* context) {
 
     //create and fill out queue create info structs. think of queues as workers, we set up 2 graphics queues to render a frame alongside the next
     const f32 queue_priority[3] = {1.0f, 1.0f, 1.0f};
-    VkDeviceQueueCreateInfo queue_create_infos[index_count];
+    VkDeviceQueueCreateInfo queue_create_infos[32];
     const f32 queue_priorities[2] = {1.0f, 1.0f};
     for (u32 i = 0; i < index_count; ++i) {
         queue_create_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;

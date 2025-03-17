@@ -1,5 +1,5 @@
 #include "vulkan_framebuffer.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 
 void create_vulkan_framebuffer(vulkan_context *context, vulkan_renderpass *renderpass, u32 width, u32 height, u32 attachment_count, VkImageView *attachments, vulkan_framebuffer *out_framebuffer) {
     out_framebuffer->attachments = m_allocate(sizeof(VkImageView) * attachment_count, MEMORY_TAG_RENDERER);

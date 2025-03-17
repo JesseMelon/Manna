@@ -53,9 +53,12 @@ STATIC_ASSERT(sizeof(f64) == 8, "f64 must be 8 bytes");
 
 #define CLAMP(value, min, max) (value <= min) ? min : (value >= max) ? max : value;
 
-#ifdef M_PLATFORM_WINDOWS
+#if defined(_MSC_VER)
 #define INLINE __forceinline
 #define NOINLINE __declspec(noinline)
+#elif defined(__clang__) || defined(__gcc__)
+#define INLINE __attribute__((always_inline)) inline
+#define NOINLINE __attribute__((noinline))
 #else
 #define INLINE static inline
 #define NOINLINE

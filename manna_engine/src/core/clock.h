@@ -6,8 +6,8 @@ typedef struct clock {
     f64 elapsed;
 } clock;
 
-void update_clock(clock* clock);
+MANNA_API void update_clock(clock* clock);
 
-void start_clock(clock* clock);
+MANNA_API void start_clock(clock* clock);
 
-void stop_clock(clock* clock);
+MANNA_API void stop_clock(clock* clock);

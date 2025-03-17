@@ -1,6 +1,6 @@
 #include "vulkan_swapchain.h"
 #include "core/logger.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "vulkan_image.h"
 #include "vulkan_device.h"
 
@@ -8,7 +8,6 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
     VkExtent2D swapchain_extent = {width, height};
 
     //max frames in flight 2 means we will use tripple buffering. one of the three will always be presented, thus two are writeable.
-    swapchain->max_frames_in_flight = 2;
 
     b8 found = FALSE;
     for (u32 i = 0; i < context->device.swapchain_support.format_count; ++i) {
@@ -52,6 +51,8 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
         image_count = context->device.swapchain_support.capabilities.maxImageCount;
     }
         
+    swapchain->max_frames_in_flight = image_count - 1;
+
     //fill out swapchain create info and create swapchain
     VkSwapchainCreateInfoKHR swapchain_create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
     swapchain_create_info.surface = context->surface;

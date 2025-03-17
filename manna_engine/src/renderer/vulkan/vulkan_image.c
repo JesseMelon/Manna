@@ -1,6 +1,6 @@
 #include "vulkan_image.h"
 #include "vulkan_device.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "core/logger.h"
 
 void create_vulkan_image(

@@ -1,6 +1,6 @@
 #include "core/event.h"
 #include "containers/darray.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "defines.h"
 
 //TODO: Jobify, defer
@@ -20,38 +20,41 @@ typedef struct event_system_state {
     event events[MAX_EVENTS];
 }event_system_state;
 
-static b8 initialized = FALSE;
-static event_system_state state;
+static event_system_state* state_ptr;
 
-b8 init_events() {
-    if (initialized == TRUE) {
-        return FALSE;
+void init_events(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(event_system_state);
+    if (state == 0) {
+        return;
     }
     m_set_memory(&state, 0, sizeof(state));
-    initialized = TRUE;
-    return TRUE;
+    state_ptr = state;
+    return;
 }
 
-void shutdown_events() {
-    for (u16 i = 0; i < MAX_EVENTS; ++i) {
-        if (state.events[i].listeners != 0) {
-            darray_destroy(state.events[i].listeners);
-            state.events[i].listeners = 0; //nullptr
+void shutdown_events(void* state) {
+    if (state_ptr) {
+        for (u16 i = 0; i < MAX_EVENTS; ++i) {
+            if (state_ptr->events[i].listeners != 0) {
+                darray_destroy(state_ptr->events[i].listeners);
+                state_ptr->events[i].listeners = 0; //nullptr
+            }
         }
     }
+    state_ptr = 0;
 }
 
 b8 listen_to_event(u16 event_id, void *listener, event_handler on_event) {
     //these ifs are kindof expensive. Should probably remove from dist and/or release builds
-    if (!initialized) {
+    if (!state_ptr) {
         return FALSE;
     }
-    if (state.events[event_id].listeners == 0) {
-        state.events[event_id].listeners = darray_create(event_listener);
+    if (state_ptr->events[event_id].listeners == 0) {
+        state_ptr->events[event_id].listeners = darray_create(event_listener);
     }
-    u64 listener_count = darray_get_length(state.events[event_id].listeners);
+    u64 listener_count = darray_get_length(state_ptr->events[event_id].listeners);
     for (u64 i = 0; i < listener_count; ++i) {
-        if (state.events[event_id].listeners->instance == listener) {
+        if (state_ptr->events[event_id].listeners->instance == listener) {
             //TODO: warn
             return FALSE;
         }
@@ -59,25 +62,25 @@ b8 listen_to_event(u16 event_id, void *listener, event_handler on_event) {
     event_listener event_listener;
     event_listener.instance = listener;
     event_listener.on_event = on_event;
-    darray_push(state.events[event_id].listeners, event_listener);
+    darray_push(state_ptr->events[event_id].listeners, event_listener);
     
     return TRUE;
 }
 
 b8 ignore_event(u16 event_id, void *listener, event_handler on_event) {
-    if (initialized == FALSE) {
+    if (!state_ptr) {
         return FALSE;
     }
-    if (state.events[event_id].listeners == 0) {
+    if (state_ptr->events[event_id].listeners == 0) {
         //TODO: warn
         return FALSE;
     }
-    u64 listener_count = darray_get_length(state.events[event_id].listeners);
+    u64 listener_count = darray_get_length(state_ptr->events[event_id].listeners);
     for (u64 i = 0; i < listener_count; ++i) {
-        event_listener event_listener = state.events[event_id].listeners[i];
+        event_listener event_listener = state_ptr->events[event_id].listeners[i];
         if (event_listener.instance == listener && event_listener.on_event == on_event) {
             struct event_listener popped_listener;
-            darray_pop_at(state.events[event_id].listeners, i, &popped_listener);
+            darray_pop_at(state_ptr->events[event_id].listeners, i, &popped_listener);
             return TRUE;
         }
     }
@@ -86,16 +89,16 @@ b8 ignore_event(u16 event_id, void *listener, event_handler on_event) {
 }
 
 b8 trigger_event(u16 event_id, void *sender, event_data event_data) {
-    if (initialized == FALSE) {
+    if (!state_ptr) {
         return FALSE;
     }
-    if (state.events[event_id].listeners == 0) {
+    if (state_ptr->events[event_id].listeners == 0) {
         //TODO: warn
         return FALSE;
     }
-    u64 listener_count = darray_get_length(state.events[event_id].listeners);
+    u64 listener_count = darray_get_length(state_ptr->events[event_id].listeners);
     for (u64 i = 0; i < listener_count; ++i) {
-        event_listener event_listener = state.events[event_id].listeners[i];
+        event_listener event_listener = state_ptr->events[event_id].listeners[i];
         if (event_listener.on_event(event_id, sender, event_listener.instance, event_data)) { //on_event function returns a bool for the if.
             //handled
             return TRUE;

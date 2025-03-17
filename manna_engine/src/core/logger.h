@@ -20,8 +20,15 @@ typedef enum log_level{
 	LOG_LEVEL_TRACE = 5
 } log_level;
 
-b8 init_logger();
-void shutdown_logger();
+/**
+ * @brief initialize logs. call with state = 0 to get memory requirement, again to fill state.
+ *
+ * @param[in,out] memory_requirement [TODO:description]
+ * @param[out] state [TODO:description]
+ * @return [TODO:description]
+ */
+b8 init_logger(u64* memory_requirement, void* state);
+void shutdown_logger(void* state);
 
 MANNA_API void m_log(log_level level, const char *message, ...); // variadic args for passing parameters into the out string
 

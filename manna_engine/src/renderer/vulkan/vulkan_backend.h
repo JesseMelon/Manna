@@ -1,6 +1,5 @@
 #pragma once
 
-#include "renderer/renderer_backend.h"
 #include "renderer/renderer_types.h"
 
 /**
@@ -15,7 +14,7 @@
  * @param[in] platform_state platform state for platform specific surface creation
  * @return TRUE if initialization succeeds. FALSE otherwise.
  */
-b8 init_vulkan_renderer_backend(renderer_backend* backend, const char* application_name, struct platform_state* platform_state);
+b8 init_vulkan_renderer_backend(renderer_backend* backend, const char* application_name);
 
 /**
  * @brief cleans up everything created by init_vulkan_renderer_backend

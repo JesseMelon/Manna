@@ -39,8 +39,8 @@ typedef union event_data {
  */
 typedef b8 (*event_handler)(u16 event_id, void* sender, void* listener_instance, event_data data);
 
-b8 init_events();
-void shutdown_events();
+void init_events(u64* memory_requirement, void* state);
+void shutdown_events(void* state);
 
 /**
  * @brief Register to listen for an event. When the event occurs, on_event is invoked.

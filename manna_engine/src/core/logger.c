@@ -7,22 +7,46 @@
 #include <stdarg.h>
 #include <string.h>
 
+typedef struct logger_state {
+    b8 initialized;
+} logger_state;
+
 void report_assertion_fail(const char* file, int line, const char* expression, const char* message) {
 	m_log(LOG_LEVEL_ERROR, "Assertion Failed: %s File: %s Line: %d Message: %s\n", expression, file, line, message);
 }
-b8 init_logger() {
+
+static logger_state* state_ptr;
+
+
+b8 init_logger(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(logger_state);
+    if (state == 0) {
+        return TRUE;
+    }
+
+    state_ptr = state;
+    state_ptr->initialized = TRUE;
+
+    //TODO: remove this
+	//LOG_FATAL("Fatal! %f:", 1.0);
+	LOG_ERROR("Error!");
+	LOG_WARN("Warn!");
+	LOG_DEBUG("Debug!");
+	LOG_INFO("Info!");
+	LOG_TRACE("Trace!");
+
 	//TODO create log file
 	return TRUE;
 }
-void shutdown_logger() {
+void shutdown_logger(void* state) {
 	//TODO cleanup logging/write queued entries
 }
 void m_log(log_level level, const char* message, ...) {
 	//TODO add to a thread
 	const char* levels[6] = { "FATAL", "ERROR", "WARNING","DEBUG", "INFO", "TRACE"};
 	b8 is_error = level > LOG_LEVEL_WARN;
-	const i32 msg_length = 32000;
-	char buffer[msg_length]; //TODO mind the limit
+#define MESSAGE_LENGTH 32000
+	char buffer[MESSAGE_LENGTH]; //TODO mind the limit
 
 	va_list args;
 	va_start(args, message);

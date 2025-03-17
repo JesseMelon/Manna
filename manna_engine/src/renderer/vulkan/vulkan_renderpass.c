@@ -1,5 +1,5 @@
 #include "vulkan_renderpass.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 
 void create_vulkan_renderpass(vulkan_context *context, vulkan_renderpass *out_renderpass, f32 x, f32 y, f32 w, f32 h, f32 r, f32 g, f32 b, f32 a, f32 depth, u32 stencil) {
 
@@ -19,8 +19,8 @@ void create_vulkan_renderpass(vulkan_context *context, vulkan_renderpass *out_re
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
     //attachments TODO: make configurable
-    u32 attachment_description_count = 2;
-    VkAttachmentDescription attachment_descriptions[attachment_description_count];
+#define ATTACHMENT_DESCRIPTION_COUNT 2
+    VkAttachmentDescription attachment_descriptions[ATTACHMENT_DESCRIPTION_COUNT];
 
     //color attachment
     VkAttachmentDescription color_attachment;
@@ -87,7 +87,7 @@ void create_vulkan_renderpass(vulkan_context *context, vulkan_renderpass *out_re
     dependency.dependencyFlags = 0;
     
     VkRenderPassCreateInfo render_pass_create_info = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
-    render_pass_create_info.attachmentCount = attachment_description_count;
+    render_pass_create_info.attachmentCount = ATTACHMENT_DESCRIPTION_COUNT;
     render_pass_create_info.pAttachments = attachment_descriptions;
     render_pass_create_info.subpassCount = 1;
     render_pass_create_info.pSubpasses = &subpass;

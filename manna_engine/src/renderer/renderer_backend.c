@@ -1,10 +1,8 @@
 #include "renderer/renderer_backend.h"
-#include "platform/platform.h"
 #include "renderer/renderer_types.h"
 #include "vulkan/vulkan_backend.h"
 
-b8 create_renderer_backend(renderer_backend_type type, struct platform_state* platform_state, renderer_backend* out_renderer_backend) {
-    out_renderer_backend->platform_state = platform_state;
+b8 create_renderer_backend(renderer_backend_type type, renderer_backend* out_renderer_backend) {
 
     if (type == VULKAN) {
         out_renderer_backend->initialize = init_vulkan_renderer_backend;

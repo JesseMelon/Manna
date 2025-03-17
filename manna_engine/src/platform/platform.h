@@ -2,12 +2,9 @@
 
 #include "defines.h"
 
-typedef struct platform_state {
-	void* internal_state;
-} platform_state;
-
 b8 platform_startup(
-	platform_state* platform_state,
+    u64* memory_requirement,
+	void* platform_state,
 	const char* title,
 	i32 x,
 	i32 y,
@@ -15,9 +12,9 @@ b8 platform_startup(
 	i32 height);
 
 //TODO: remove API exports
-void shutdown_platform(platform_state* platform_state);
+void shutdown_platform(void* platform_state);
 
-b8 platform_get_messages(platform_state* platform_state);
+b8 platform_get_messages();
 
 MANNA_API void* platform_allocate(u64, b8 aligned);
 MANNA_API void platform_free(void* block, b8 aligned);

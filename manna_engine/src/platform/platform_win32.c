@@ -19,31 +19,35 @@
 #include "vulkan/vulkan_win32.h"
 #include "renderer/vulkan/vulkan_types.h"
 
-typedef struct internal_state {
+typedef struct platform_state {
 	HINSTANCE instance;
 	HWND window;
     VkSurfaceKHR surface; //probably wont stay here
-} internal_state;
+    f64 clock_frequency;
+    LARGE_INTEGER start_time;
+} platform_state;
 
-static f64 clock_frequency;
-static LARGE_INTEGER start_time;
+static platform_state* state_ptr;
 
 LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM w_param, LPARAM l_param); //forward declare window event handler
 
 b8 platform_startup(
-	platform_state* platform_state,
+    u64* memory_requirement,
+	void* state,
 	const char* title,
 	i32 x,
 	i32 y,
 	i32 width,
 	i32 height) {
 
-	platform_state->internal_state = malloc(sizeof(internal_state)); //instantiate internal state
-	if(!platform_state->internal_state) { return FALSE; }
+    *memory_requirement = sizeof(platform_state);
+    if (state == 0) {
+        return TRUE;
+    }
 
-	internal_state *state = (internal_state *)platform_state->internal_state; //state variable = internal_state variable casted to windows specific internal_state type
+    state_ptr = state;
 
-	state->instance = GetModuleHandle(NULL);					//returns handle to currently executing program
+	state_ptr->instance = GetModuleHandle(NULL);					//returns handle to currently executing program
 
 	//configure window class
 	HICON icon = LoadIcon(state->instance, IDI_APPLICATION);	//TODO: use (HICON)LoadImageW(instance, MAKEINTRESOURCE(MY_ICON), IMAGE_ICON, 32, 32, LR_LOADFROMFILE); for finer control. 
@@ -52,7 +56,7 @@ b8 platform_startup(
 	wc.lpfnWndProc = win32_window_process_message;				//long pointer to window procedure function, function for handling window events
 	wc.cbClsExtra = 0;											//legacy class specific mem allocation shared by all windows from this class
 	wc.cbWndExtra = 0;											//legacy window specific mem allocation
-	wc.hInstance = state->instance;								//handle to the program containing window procedure
+	wc.hInstance = state_ptr->instance;								//handle to the program containing window procedure
 	wc.hIcon = icon;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);					//load stock arrow cursor
 	wc.hbrBackground = NULL;
@@ -89,7 +93,7 @@ b8 platform_startup(
 		height,
 		NULL,
 		NULL,
-		state->instance,
+		state_ptr->instance,
 		NULL);
 
 	if (!window_handle) {
@@ -97,40 +101,42 @@ b8 platform_startup(
 		LOG_FATAL("Window creation failed");
 		return FALSE;
 	} else {
-		state->window = window_handle;
+		state_ptr->window = window_handle;
 	}
 
 	//set command flags
 	b32 should_activivate = 1; //accept input
 	i32 show_window_command_flags = should_activivate ? SW_SHOW : SW_SHOWNOACTIVATE;
 
-	ShowWindow(state->window, show_window_command_flags);
+	ShowWindow(state_ptr->window, show_window_command_flags);
 	
 	//setup clock
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency(&frequency);
-	clock_frequency = 1.0 / (f64)frequency.QuadPart;
-	QueryPerformanceCounter(&start_time);
+	state_ptr->clock_frequency = 1.0 / (f64)frequency.QuadPart;
+	QueryPerformanceCounter(&state_ptr->start_time);
 
 	return TRUE;
 }
 
-void shutdown_platform(platform_state* platform_state) {
-	internal_state * state = (internal_state *)platform_state->internal_state;
+void shutdown_platform(void* platform_state) {
 
-	if (state->window) {
-		DestroyWindow(state->window);
-		state->window = 0;
+	if (state_ptr && state_ptr->window) {
+		DestroyWindow(state_ptr->window);
+		state_ptr->window = 0;
 	}
 }
 
-b8 platform_get_messages (platform_state* platform_state) {
-	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+b8 platform_get_messages () {
+    if (state_ptr) {
+	    MSG msg;
+    	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	    	TranslateMessage(&msg);
+	    	DispatchMessage(&msg);
+        }
 	}
 
+    
 	return TRUE;
 }
 
@@ -188,7 +194,7 @@ f64 platform_get_time()
 {
 	LARGE_INTEGER current_time;
 	QueryPerformanceCounter(&current_time);
-	return (f64)current_time.QuadPart * clock_frequency;
+	return (f64)current_time.QuadPart * state_ptr->clock_frequency;
 }
 
 void platform_sleep(u64 ms)
@@ -201,18 +207,21 @@ void vulkan_platform_get_required_extension_names(const char ***names_darray) {
 }
 
 b8 platform_create_vulkan_surface(platform_state* platform_state, vulkan_context* context) {
-    internal_state *state = (internal_state *)platform_state->internal_state;
+
+    if (!state_ptr) {
+        return false;
+    }
 
     VkWin32SurfaceCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR};
-    create_info.hinstance = state->instance;
-    create_info.hwnd = state->window;
+    create_info.hinstance = state_ptr->instance;
+    create_info.hwnd = state_ptr->window;
 
-    VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state->surface);
+    VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state_ptr->surface);
     if (result != VK_SUCCESS) {
         LOG_FATAL("Vulkan surface creation failed");
         return FALSE;
     }
-    context->surface = state->surface;
+    context->surface = state_ptr->surface;
     return TRUE;
 }
 
@@ -247,6 +256,29 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
 			//on key messages, w_param is a 16 bit data package with keycode, which is sent in to process key.
 			b8 pressed = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
 			keys key = (u16)w_param;
+
+            //windows does not differentiate between left and right keys without this 
+            // 0x8000 is the bit indicating the key is pressed
+            if (w_param == VK_SHIFT) {
+                if(GetKeyState(VK_RSHIFT) & 0x8000) {
+                    key = KEY_RSHIFT;
+                } else if(GetKeyState(VK_LSHIFT) & 0x8000) {
+                    key = KEY_LSHIFT;
+                }
+            } else if(w_param == VK_CONTROL) {
+                if(GetKeyState(VK_RCONTROL) & 0x8000) {
+                    key = KEY_RCONTROL;
+                } else if(GetKeyState(VK_LCONTROL) & 0x8000){
+                    key = KEY_LCONTROL;
+                }
+            } else if(w_param == VK_MENU) {
+                if(GetKeyState(VK_RMENU) & 0x8000) {
+                    key = KEY_RALT;
+                } else if(GetKeyState(VK_LMENU) & 0x8000){
+                    key = KEY_LALT;
+                }
+            }
+
 			process_key(key, pressed);
 			
 		} break;

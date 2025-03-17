@@ -1,6 +1,6 @@
 #include "vulkan_backend.h"
 #include "core/application.h"
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "renderer/vulkan/vulkan_command_buffer.h"
 #include "renderer/vulkan/vulkan_fence.h"
 #include "renderer/vulkan/vulkan_utils.h"
@@ -13,7 +13,6 @@
 #include "core/logger.h"
 #include "core/mstring.h"
 #include "containers/darray.h"
-#include "platform/platform.h"
 
 static vulkan_context context;
 static u32 cached_framebuffer_width = 0;
@@ -149,7 +148,7 @@ i32 find_memory_index(u32 type_filter, u32 property_flags) {
     return -1;
 }
 
-b8 init_vulkan_renderer_backend(renderer_backend *backend, const char *application_name, struct platform_state *platform_state) {
+b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *application_name) {
     
     context.find_memory_index = find_memory_index;
 
@@ -257,7 +256,7 @@ b8 init_vulkan_renderer_backend(renderer_backend *backend, const char *applicati
     
     //let platform layer handle surface creation
     LOG_DEBUG("Creating vulkan surface");
-    if (!platform_create_vulkan_surface(platform_state, &context)) {
+    if (!platform_create_vulkan_surface(&context)) {
         LOG_ERROR("Failed to create platform surface");
         return FALSE;
     }

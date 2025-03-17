@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/memory.h"
+#include "memory/memory.h"
 #include "defines.h"
 #include "math_types.h"
 

@@ -1,20 +1,21 @@
-#include "game.h"
+#include "app.h"
 #include <manna.h>
 
 //define create_game 
-b8 create_game(game* out_game) {
+b8 create_manna_app(manna_app* out_app) {
 
-	out_game->app_config.title = "Manna Editor";
-	out_game->app_config.x = 100;
-	out_game->app_config.y = 100;
-	out_game->app_config.width = 1280;
-	out_game->app_config.height = 720;
-	out_game->update = game_update;
-	out_game->render = game_render;
-	out_game->initialize = game_initialize;
-	out_game->on_resize = game_on_resize;
+	out_app->app_config.title = "Manna Editor";
+	out_app->app_config.x = 100;
+	out_app->app_config.y = 100;
+	out_app->app_config.width = 1280;
+	out_app->app_config.height = 720;
+	out_app->update = update_app;
+	out_app->render = render_app;
+	out_app->initialize = initialize_app;
+	out_app->on_resize = app_on_resize;
 	
-	out_game->state = m_allocate(sizeof(game_state), MEMORY_TAG_EDITOR);
+	out_app->state = m_allocate(sizeof(state), MEMORY_TAG_EDITOR);
+    out_app->application_state = 0;
 	
 	return TRUE;
 }

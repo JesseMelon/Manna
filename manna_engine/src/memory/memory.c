@@ -15,27 +15,45 @@ struct memory_stats {
 
 static const char* memory_tag_strings[MEMORY_TAG_COUNT] = {
 	"UNKNOWN",
+    "APPLICATION",
+    "ARRAY",
+    "LINEAR_ALOC",
     "DARRAY",
     "EDITOR",
     "STRING",
     "RENDERER"
 };
 
-static struct memory_stats stats;
+typedef struct memory_state {
+    struct memory_stats stats;
+    u64 alloc_count;
+} memory_state;
 
-void init_memory() {
-	platform_set_memory(&stats, 0, sizeof(stats));
+static memory_state* state_ptr;
+
+void init_memory(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(memory_state);
+    if (state == 0) {
+        return;
+    }
+    state_ptr = state;
+    state_ptr->alloc_count = 0;
+	platform_set_memory(&state_ptr->stats, 0, sizeof(state_ptr->stats));
 }
-void shutdown_memory() {}
+void shutdown_memory(void* state) {
+    state_ptr = 0;
+}
 
 void* m_allocate(u64 size, memory_tag tag) {
 	if (tag == MEMORY_TAG_UNKNOWN) {
 		LOG_WARN("allocating from unknown memory");
 	}
 
-	stats.total_allocated += size;
-	stats.tagged_allocations[tag] += size;
-
+    if(state_ptr) {
+	    state_ptr->stats.total_allocated += size;
+	    state_ptr->stats.tagged_allocations[tag] += size;
+        state_ptr->alloc_count++;
+    }
 	//TODO alignment
 	void* memory = platform_allocate(size, FALSE);
 	platform_set_memory(memory, 0, size);
@@ -47,8 +65,8 @@ void m_free(void* memory, u64 size, memory_tag tag) {
 		LOG_WARN("freeing from unknown memory tag");
 	}
 	
-	stats.total_allocated -= size;
-	stats.tagged_allocations[tag] -= size;
+	state_ptr->stats.total_allocated -= size;
+	state_ptr->stats.tagged_allocations[tag] -= size;
 
 	//TODO alignment
 	platform_free(memory, FALSE);
@@ -72,26 +90,34 @@ char* get_memory_usage() {
 	for (u32 i = 0; i < MEMORY_TAG_COUNT; i++) {
 		char unit[4] = "XiB";
 		float amount = 1.0f;
-		if (stats.tagged_allocations[i] >= gib) {
+		if (state_ptr->stats.tagged_allocations[i] >= gib) {
 			unit[0] = 'G';
-			amount = stats.tagged_allocations[i] / (float)gib;
+			amount = state_ptr->stats.tagged_allocations[i] / (float)gib;
 		}
-		else if (stats.tagged_allocations[i] >= mib) {
+		else if (state_ptr->stats.tagged_allocations[i] >= mib) {
 			unit[0] = 'M';
-			amount = stats.tagged_allocations[i] / (float)mib;
+			amount = state_ptr->stats.tagged_allocations[i] / (float)mib;
 		}
-		else if (stats.tagged_allocations[i] >= kib) {
+		else if (state_ptr->stats.tagged_allocations[i] >= kib) {
 			unit[0] = 'K';
-			amount = stats.tagged_allocations[i] / (float)kib;
+			amount = state_ptr->stats.tagged_allocations[i] / (float)kib;
 		}
 		else {
 			unit[0] = 'B';
 			unit[1] = 0;
-			amount = (float)stats.tagged_allocations[i];
+			amount = (float)state_ptr->stats.tagged_allocations[i];
 		}
 		i32 len = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memory_tag_strings[i], amount, unit);
 		offset += len;
 	}
 	char* out_string = duplicate_string(buffer);
 	return out_string; //free this
+}
+
+u64 get_memory_alloc_count() {
+    if (state_ptr) {
+        return state_ptr->alloc_count;
+    } else {
+        return 0;
+    }
 }

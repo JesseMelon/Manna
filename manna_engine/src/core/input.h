@@ -129,8 +129,8 @@ typedef enum keys {
      DEFINE_KEY(RSHIFT, 0xA1),
      DEFINE_KEY(LCONTROL, 0xA2),
      DEFINE_KEY(RCONTROL, 0xA3),
-     DEFINE_KEY(LMENU, 0xA4),
-     DEFINE_KEY(RMENU, 0xA5),
+     DEFINE_KEY(LALT, 0xA4),
+     DEFINE_KEY(RALT, 0xA5),
  
      DEFINE_KEY(SEMICOLON, 0xBA),
      DEFINE_KEY(PLUS, 0xBB),
@@ -143,8 +143,8 @@ typedef enum keys {
      KEY_COUNT
  } keys;
 
-void init_input();
-void shutdown_input();
+void init_input(u64* memory_requirement, void* state);
+void shutdown_input(void* state);
 void update_input(f64 delta_time);
 
 //TODO do differently
