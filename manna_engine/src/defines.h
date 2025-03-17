@@ -17,7 +17,9 @@ typedef int b32;
 typedef char b8;
 
 #define TRUE 1
+#define true 1
 #define FALSE 0
+#define false 0
 
 #if defined(__clang__) || defined(__gcc__)
 	#define STATIC_ASSERT _Static_assert

@@ -110,6 +110,24 @@ typedef struct vulkan_fence {
     b8 is_signaled;
 } vulkan_fence;
 
+typedef struct vulkan_shader_stage {
+    VkShaderModuleCreateInfo create_info;
+    VkShaderModule handle;
+    VkPipelineShaderStageCreateInfo shader_stage_create_info;
+} vulkan_shader_stage;
+
+typedef struct vulkan_pipeline {
+    VkPipeline handle;
+    VkPipelineLayout pipeline_layout;
+} vulkan_pipeline;
+
+#define OBJECT_SHADER_STAGE_COUNT 2 //vert & frag
+
+typedef struct vulkan_object_shader {
+    vulkan_shader_stage stages[OBJECT_SHADER_STAGE_COUNT];
+    vulkan_pipeline pipeline;
+} vulkan_object_shader;
+
 typedef struct vulkan_context {
     u32 framebuffer_width;
     u32 framebuffer_height;
