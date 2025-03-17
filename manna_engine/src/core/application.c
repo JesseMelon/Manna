@@ -194,8 +194,8 @@ b8 run_application() {
     shutdown_input(app_state->input_state);
     shutdown_renderer(app_state->renderer_state);
 	shutdown_platform(&app_state->platform_state);
-    shutdown_memory(&app_state->memory_state);
     shutdown_events(app_state->event_state);
+    shutdown_memory(&app_state->memory_state);
 
 
 	return TRUE;

@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "manna_editor", "manna_edito
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "manna_engine", "manna_engine\manna_engine.vcxproj", "{252BCD8B-118E-5C30-BA13-95E6A65528B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxproj", "{78756B10-E489-93C1-AD0B-372119DF8FF2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{252BCD8B-118E-5C30-BA13-95E6A65528B3} = {252BCD8B-118E-5C30-BA13-95E6A65528B3}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|x64 = debug|x64
@@ -27,6 +32,12 @@ Global
 		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.dist|x64.Build.0 = dist|x64
 		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.release|x64.ActiveCfg = release|x64
 		{252BCD8B-118E-5C30-BA13-95E6A65528B3}.release|x64.Build.0 = release|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.debug|x64.ActiveCfg = debug|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.debug|x64.Build.0 = debug|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.dist|x64.ActiveCfg = dist|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.dist|x64.Build.0 = dist|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.release|x64.ActiveCfg = release|x64
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

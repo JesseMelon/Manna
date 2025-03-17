@@ -50,7 +50,7 @@ b8 platform_startup(
 	state_ptr->instance = GetModuleHandle(NULL);					//returns handle to currently executing program
 
 	//configure window class
-	HICON icon = LoadIcon(state->instance, IDI_APPLICATION);	//TODO: use (HICON)LoadImageW(instance, MAKEINTRESOURCE(MY_ICON), IMAGE_ICON, 32, 32, LR_LOADFROMFILE); for finer control. 
+	HICON icon = LoadIcon(state_ptr->instance, IDI_APPLICATION);	//TODO: use (HICON)LoadImageW(instance, MAKEINTRESOURCE(MY_ICON), IMAGE_ICON, 32, 32, LR_LOADFROMFILE); for finer control. 
 	WNDCLASSA wc = {0};											//window class ANSI meaning 8 bit characters, as opposed to UNICODE - 16 bit characters
 	wc.style = CS_DBLCLKS;										//flags for window performance and style. Accepts double clicks in window
 	wc.lpfnWndProc = win32_window_process_message;				//long pointer to window procedure function, function for handling window events
@@ -206,10 +206,10 @@ void vulkan_platform_get_required_extension_names(const char ***names_darray) {
     darray_push(*names_darray, &"VK_KHR_win32_surface");
 }
 
-b8 platform_create_vulkan_surface(platform_state* platform_state, vulkan_context* context) {
+b8 platform_create_vulkan_surface(vulkan_context* context) {
 
     if (!state_ptr) {
-        return false;
+        return FALSE;
     }
 
     VkWin32SurfaceCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR};

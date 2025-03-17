@@ -27,7 +27,7 @@ void init_events(u64* memory_requirement, void* state) {
     if (state == 0) {
         return;
     }
-    m_set_memory(&state, 0, sizeof(state));
+    m_set_memory(state, 0, sizeof(state));
     state_ptr = state;
     return;
 }
