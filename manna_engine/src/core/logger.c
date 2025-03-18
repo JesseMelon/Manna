@@ -1,5 +1,7 @@
 #include "logger.h"
 #include "asserts.h"    // implements report assertion fail
+#include "core/mstring.h"
+#include "platform/filesystem.h"
 #include "platform/platform.h"
 
 //TODO temporary
@@ -8,7 +10,7 @@
 #include <string.h>
 
 typedef struct logger_state {
-    b8 initialized;
+    file_handle log_file_handle;
 } logger_state;
 
 void report_assertion_fail(const char* file, int line, const char* expression, const char* message) {
@@ -17,6 +19,15 @@ void report_assertion_fail(const char* file, int line, const char* expression, c
 
 static logger_state* state_ptr;
 
+void append_to_logfile(const char* message) {
+    if (state_ptr && state_ptr->log_file_handle.is_valid) {
+        u64 length = get_string_length(message);
+        u64 written = 0;
+        if (!filesystem_write(&state_ptr->log_file_handle, length, message, &written)) {
+            platform_console_write("Error writing to log", LOG_LEVEL_ERROR);
+        }
+    }
+}
 
 b8 init_logger(u64* memory_requirement, void* state) {
     *memory_requirement = sizeof(logger_state);
@@ -25,7 +36,10 @@ b8 init_logger(u64* memory_requirement, void* state) {
     }
 
     state_ptr = state;
-    state_ptr->initialized = TRUE;
+
+    if (!filesystem_open("console.log", FILE_MODE_WRITE, false, &state_ptr->log_file_handle)) {
+        platform_console_write("Unable to open console.log", LOG_LEVEL_ERROR);
+    }
 
     //TODO: remove this
 	//LOG_FATAL("Fatal! %f:", 1.0);
@@ -60,4 +74,6 @@ void m_log(log_level level, const char* message, ...) {
 	} else {
 		platform_console_write(buffer, level);
 	}
+
+    append_to_logfile(message);
 }
