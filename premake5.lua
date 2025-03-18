@@ -29,7 +29,6 @@ project "manna_engine"
     includedirs {
         "%{prj.name}/include",
         "%{prj.name}/src",
-        "%{prj.name}/bin/shaders",
         os.getenv("VULKAN_SDK") .. "/include" or ""
     }
 
@@ -101,6 +100,7 @@ project "manna_editor"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("obj/" .. outputdir .. "/%{prj.name}")
+    debugdir ("bin/" .. outputdir .. "/%{prj.name}")
 
     files {
         "%{prj.name}/**.h",
