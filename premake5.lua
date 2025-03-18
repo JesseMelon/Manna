@@ -43,8 +43,8 @@ project "manna_engine"
         libdirs { os.getenv("VULKAN_SDK") .. "/Lib" or "" }
         links { "vulkan-1" }
         postbuildcommands {
-            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.vert.spv",
-            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.frag.spv"
+            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.vert.spv",
+            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.frag.spv"
         }
 
     filter "system:linux"
@@ -55,9 +55,14 @@ project "manna_engine"
         links { "vulkan", "xcb", "X11", "X11-xcb", "xkbcommon", "m" }
         linkoptions { ("-Wl,-rpath," .. os.getenv("VULKAN_SDK") .. "/lib") or "" }
         postbuildcommands {
-            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.vert.spv",
-            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.frag.spv"
+            "mkdir -p " .. wksRoot .. "/bin/shaders && \"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.vert.spv",
+            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.frag.spv"
         }
+
+--        postbuildcommands {
+--            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.vert.spv",
+--            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.frag.spv"
+--        }
 
     filter "system:macosx"
         staticruntime "On"
@@ -125,7 +130,7 @@ project "manna_editor"
         staticruntime "On"
         defines { "M_PLATFORM_LINUX" }
         postbuildcommands {
-            "cp -r " .. wksRoot .. "/assets/* " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/ || echo 'Assets folder empty, nothing to copy'",
+            --"cp -r " .. wksRoot .. "/assets/* " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/ || echo 'Assets folder empty, nothing to copy'",
             "{COPY} " .. wksRoot .. "/bin/" .. outputdir .. "/manna_engine/libmanna_engine.so " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor"
         }
 
@@ -133,7 +138,7 @@ project "manna_editor"
         staticruntime "On"
         defines { "M_PLATFORM_MACOS" }
         postbuildcommands {
-            "cp -r " .. wksRoot .. "/assets/* " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/ || echo 'Assets folder empty, nothing to copy'",
+            --"cp -r " .. wksRoot .. "/assets/* " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/ || echo 'Assets folder empty, nothing to copy'",
             "{COPY} " .. wksRoot .. "/bin/" .. outputdir .. "/manna_engine/manna_engine.dylib " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor"
         }
 

@@ -14,6 +14,9 @@
 #include "core/mstring.h"
 #include "containers/darray.h"
 
+//shaders
+#include "shaders/vulkan_object_shader.h"
+
 static vulkan_context context;
 static u32 cached_framebuffer_width = 0;
 static u32 cached_framebuffer_height = 0;
@@ -293,6 +296,11 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     context.images_in_flight = darray_reserve(vulkan_fence, context.swapchain.image_count);
     for (u32 i = 0; i < context.swapchain.image_count; ++i) {
         context.images_in_flight[i] = 0;
+    }
+
+    if (!create_vulkan_object_shader(&context, &context.object_shader)) {
+        LOG_ERROR("Error loading built-in shader");
+        return false;
     }
 
     LOG_INFO("Vulkan renderer initialized");
