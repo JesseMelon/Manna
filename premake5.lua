@@ -43,7 +43,7 @@ project "manna_engine"
         libdirs { os.getenv("VULKAN_SDK") .. "/Lib" or "" }
         links { "vulkan-1" }
         postbuildcommands {
-            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.vert.spv",
+            "mkdir \"" .. wksRoot .. "\\bin\\shaders\" 2>NUL & \"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.vert.spv",
             "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc.exe\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/shaders/Builtin.ObjectShader.frag.spv"
         }
 

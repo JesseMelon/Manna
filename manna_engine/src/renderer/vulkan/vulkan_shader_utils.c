@@ -9,7 +9,7 @@ b8 create_shader_module(vulkan_context *context, const char *name, const char *t
     //build file name
     char file_name[512];
     //TODO: configurable path
-    format_string(file_name, "bin/shaders/%s.%s.spv", name, type_str);
+    format_string(file_name, "../bin/shaders/%s.%s.spv", name, type_str);
 
     m_set_memory(&shader_stages[stage_index].create_info, 0, sizeof(VkShaderModuleCreateInfo));
     shader_stages[stage_index].create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
