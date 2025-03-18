@@ -29,6 +29,7 @@ project "manna_engine"
     includedirs {
         "%{prj.name}/include",
         "%{prj.name}/src",
+        "%{prj.name}/bin/shaders",
         os.getenv("VULKAN_SDK") .. "/include" or ""
     }
 
