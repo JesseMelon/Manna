@@ -7,7 +7,6 @@
 //TODO temporary
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 
 typedef struct logger_state {
     file_handle log_file_handle;
@@ -54,6 +53,8 @@ b8 init_logger(u64* memory_requirement, void* state) {
 }
 void shutdown_logger(void* state) {
 	//TODO cleanup logging/write queued entries
+    filesystem_close(&state_ptr->log_file_handle);
+    state_ptr = 0;
 }
 void m_log(log_level level, const char* message, ...) {
 	//TODO add to a thread
@@ -64,10 +65,10 @@ void m_log(log_level level, const char* message, ...) {
 
 	va_list args;
 	va_start(args, message);
-	int written = snprintf(buffer, sizeof(buffer), "[%s]: ", levels[level]);	//prepend level
-	vsnprintf(buffer + written, sizeof(buffer) - written, message, args);		//pass message
-	snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "\n");	//null terminate
+    format_string_v(buffer, message, args);
 	va_end(args);
+
+    format_string(buffer, "%s%s\n", levels[level], message);
 
 	if (is_error) {
 		platform_console_write_error(buffer, level);
