@@ -32,7 +32,7 @@ static LARGE_INTEGER start_time;
 LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM w_param, LPARAM l_param); //forward declare window event handler
 
 void clock_setup() {
-    LARGE_INTEGER clock_frequency;
+    LARGE_INTEGER frequency;
     QueryPerformanceFrequency(&frequency);
     clock_frequency = 1.0 / (f64)frequency.QuadPart;
     QueryPerformanceCounter(&start_time);
@@ -264,6 +264,7 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
 			//on key messages, w_param is a 16 bit data package with keycode, which is sent in to process key.
 			b8 pressed = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
 			keys key = (u16)w_param;
+			b8 is_extended = (l_param & (1 << 24)) != 0;
 
             //windows does not differentiate between left and right keys without this 
             // 0x8000 is the bit indicating the key is pressed
@@ -271,7 +272,7 @@ LRESULT CALLBACK win32_window_process_message(HWND window, UINT message, WPARAM 
             if (w_param == VK_SHIFT) {
                 u32 left_shift = MapVirtualKey(VK_LSHIFT, MAPVK_VK_TO_VSC);
                 u32 scancode = ((l_param & (0xFF << 16)) >> 16);
-                key = scancode == leftshift ? KEY_LSHIFT : KEY_RSHIFT;
+                key = scancode == left_shift ? KEY_LSHIFT : KEY_RSHIFT;
             } else if(w_param == VK_CONTROL) {
                 key = is_extended ? KEY_RCONTROL : KEY_LCONTROL;
             } else if(w_param == VK_MENU) {
