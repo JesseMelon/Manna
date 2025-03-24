@@ -31,13 +31,14 @@ void append_to_logfile(const char* message) {
 b8 init_logger(u64* memory_requirement, void* state) {
     *memory_requirement = sizeof(logger_state);
     if (state == 0) {
-        return TRUE;
+        return true;
     }
 
     state_ptr = state;
 
     if (!filesystem_open("console.log", FILE_MODE_WRITE, false, &state_ptr->log_file_handle)) {
         platform_console_write("Unable to open console.log", LOG_LEVEL_ERROR);
+        return false;
     }
 
     //TODO: remove this
@@ -49,7 +50,7 @@ b8 init_logger(u64* memory_requirement, void* state) {
 	LOG_TRACE("Trace!");
 
 	//TODO create log file
-	return TRUE;
+	return true;
 }
 void shutdown_logger(void* state) {
 	//TODO cleanup logging/write queued entries
@@ -68,7 +69,7 @@ void m_log(log_level level, const char* message, ...) {
     format_string_v(buffer, message, args);
 	va_end(args);
 
-    format_string(buffer, "%s%s\n", levels[level], message);
+    format_string(buffer, "%s: %s\n", levels[level], buffer);
 
 	if (is_error) {
 		platform_console_write_error(buffer, level);
