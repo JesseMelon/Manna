@@ -1,7 +1,7 @@
 workspace "Manna"
     architecture "x64"
     cdialect "gnu17"
-    configurations { "debug", "release", "dist" }
+    configurations { "debug", "release", "dist", "profile" }
     startproject "Editor"
     outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -63,6 +63,11 @@ project "manna_engine"
 --            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=vert " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.vert.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.vert.spv",
 --            "\"" .. os.getenv("VULKAN_SDK") .. "/bin/glslc\" -fshader-stage=frag " .. wksRoot .. "/assets/shaders/Builtin.ObjectShader.frag.glsl -o " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor/Builtin.ObjectShader.frag.spv"
 --        }
+--
+--        -- Add gperftools for profile config on Linux
+        filter { "system:linux", "configurations:profile" }
+            links { "profiler" } -- Link libprofiler for gperftools
+            buildoptions { "-g" } -- Ensure debug symbols for profiling
 
     filter "system:macosx"
         staticruntime "On"
@@ -86,6 +91,11 @@ project "manna_engine"
     filter "configurations:dist"
         defines "DIST"
         optimize "On"
+
+    filter "configurations:profile"
+        defines "PROFILE"
+        --optimize "On" -- Keep optimizations for realistic performance
+        symbols "On"
 
     filter { "system:windows", "configurations:release"}
         buildoptions "/MT"
@@ -135,6 +145,11 @@ project "manna_editor"
             "{COPY} " .. wksRoot .. "/bin/" .. outputdir .. "/manna_engine/libmanna_engine.so " .. wksRoot .. "/bin/" .. outputdir .. "/manna_editor"
         }
 
+    -- Add gperftools for profile config on Linux
+    filter { "system:linux", "configurations:profile" }
+        links { "profiler" } -- Link libprofiler for gperftools
+        buildoptions { "-g" } -- Ensure debug symbols for profiling
+
     filter "system:macosx"
         staticruntime "On"
         defines { "M_PLATFORM_MACOS" }
@@ -155,6 +170,10 @@ project "manna_editor"
         defines "DIST"
         optimize "On"
 
+    filter "configurations:profile"
+        defines "PROFILE"
+        --optimize "On" -- Keep optimizations for realistic performance
+        symbols "On"
 -------------------------------------------------------------------------------------------------------------------------------
 --- Tests
 -------------------------------------------------------------------------------------------------------------------------------

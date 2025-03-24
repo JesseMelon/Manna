@@ -2,12 +2,14 @@
 
 # Flag to determine if we should clean
 CLEAN=false
+PROFILE=false
 
 # Check for -c argument
-while getopts "c" opt; do
+while getopts "cp" opt; do
     case $opt in
         c) CLEAN=true;;
-        ?) echo "Usage: $0 [-c]"; exit 1;;
+        p) PROFILE=true;;
+        ?) echo "Usage: $0 [-c] [-p]"; exit 1;;
     esac
 done
 
@@ -19,4 +21,11 @@ if [ "$CLEAN" = true ]; then
 fi
 
 ./thirdparty/bin/premake5/linux/premake5 gmake --os=linux
-make
+
+if [ "$PROFILE" = true ]; then
+    echo "building profile configuration"
+    gmake config=profile
+else
+    echo "building debug configuration"
+    gmake
+fi
