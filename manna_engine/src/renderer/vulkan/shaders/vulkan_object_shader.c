@@ -94,7 +94,7 @@ void destroy_vulkan_object_shader(vulkan_context *context, struct vulkan_object_
         shader->stages[i].handle = 0;
     }
 }
-
+ 
 void use_vulkan_object_shader(vulkan_context *context, struct vulkan_object_shader *shader) {
     u32 image_index = context->image_index;
     bind_vulkan_pipeline(&context->graphics_command_buffers[image_index], VK_PIPELINE_BIND_POINT_GRAPHICS, &shader->pipeline);

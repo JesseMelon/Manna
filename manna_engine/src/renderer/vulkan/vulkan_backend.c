@@ -294,8 +294,8 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     LOG_DEBUG("Creating vulkan debugger");
     u32 message_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT; // |
-    //  VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-    //  VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+        //VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | // |
+        //VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
     debug_create_info.messageSeverity = message_severity;
@@ -363,15 +363,9 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     vertex verts[TEMP_VERTEX_COUNT];
     m_set_memory(verts, 0, sizeof(vertex) * TEMP_VERTEX_COUNT);
 
-    verts[0].position.x = 0.0;
-    verts[0].position.y = -0.5;
-    verts[0].position.z = 0;
-    verts[1].position.x = 0.5;
-    verts[1].position.y = 0.5;
-    verts[1].position.z = 0;
-    verts[2].position.x = 0;
-    verts[2].position.y = 0.5;
-    verts[2].position.z = 0;
+verts[0].position = (vec3){-0.5, -0.5, 0.0};  // Bottom-left
+verts[1].position = (vec3){ 0.5, -0.5, 0.0};  // Bottom-right
+verts[2].position = (vec3){ 0.0,  0.5, 0.0};  // Top
 
 #define TEMP_INDEX_COUNT 3
     u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2};
