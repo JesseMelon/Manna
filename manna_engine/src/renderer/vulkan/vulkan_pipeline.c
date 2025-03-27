@@ -6,10 +6,10 @@
 #include "memory/memory.h"
 
 b8 create_vulkan_pipeline(
-    vulkan_context *context,
-    vulkan_renderpass *renderpass,
+    vulkan_context* context,
+    vulkan_renderpass* renderpass,
     u32 attribute_count,
-    VkVertexInputAttributeDescription *attributes,
+    VkVertexInputAttributeDescription* attributes,
     u32 descriptor_set_layout_count,
     VkDescriptorSetLayout* descriptor_set_layouts,
     u32 stage_count,

@@ -144,6 +144,7 @@ b8 recreate_swapchain(renderer_backend* backend) {
 //faster than host coherent.
 //TODO: totally refactor this and move it somewhere
 void upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fence, VkQueue queue, vulkan_buffer* buffer, u64 offset, u64 size, void* data) {
+    LOG_DEBUG("Uploading data range");
     //create host visible staging buffer to upload to. Mark as source of transfer
     VkBufferUsageFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     vulkan_buffer staging;
@@ -173,6 +174,7 @@ i32 find_memory_index(u32 type_filter, u32 property_flags) {
 }
 
 static b8 create_buffers(vulkan_context* context) {
+    LOG_DEBUG("Creating Buffers");
     VkMemoryPropertyFlagBits memory_property_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     
     const u64 vertex_buffer_size = sizeof(vertex) * 1024 * 1024; //this is overkill?
@@ -363,16 +365,19 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
 
     verts[0].position.x = 0.0;
     verts[0].position.y = -0.5;
+    verts[0].position.z = 0;
     verts[1].position.x = 0.5;
     verts[1].position.y = 0.5;
+    verts[1].position.z = 0;
     verts[2].position.x = 0;
     verts[2].position.y = 0.5;
+    verts[2].position.z = 0;
 
 #define TEMP_INDEX_COUNT 3
     u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2};
 
     upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_vertex_buffer, 0, sizeof(vertex) * TEMP_VERTEX_COUNT, verts);
-    upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(vertex) * TEMP_INDEX_COUNT, indices);
+    upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(u32) * TEMP_INDEX_COUNT, indices);
     //end of test section
 
 

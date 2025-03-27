@@ -65,7 +65,7 @@ b8 create_vulkan_object_shader(vulkan_context *context, vulkan_object_shader *ou
         stage_create_infos[i] = out_shader->stages[i].shader_stage_create_info;
     }
 
-    create_vulkan_pipeline(
+    if (!create_vulkan_pipeline(
         context,
         &context->main_renderpass,
         ATTRIBUTE_COUNT,
@@ -77,7 +77,10 @@ b8 create_vulkan_object_shader(vulkan_context *context, vulkan_object_shader *ou
         viewport,
         scissor,
         false,
-        &out_shader->pipeline);
+        &out_shader->pipeline)) {
+        LOG_ERROR("Failed to load graphics pipeline for object shader");
+        return false;
+    }
 
     return true;
 }
