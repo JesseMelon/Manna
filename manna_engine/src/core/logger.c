@@ -5,7 +5,6 @@
 #include "platform/platform.h"
 
 //TODO temporary
-#include <stdio.h>
 #include <stdarg.h>
 
 typedef struct logger_state {
@@ -22,7 +21,7 @@ void append_to_logfile(const char* message) {
     if (state_ptr && state_ptr->log_file_handle.is_valid) {
         u64 length = get_string_length(message);
         u64 written = 0;
-        if (!filesystem_write(&state_ptr->log_file_handle, length, message, &written)) {
+        if (!write_to_file(&state_ptr->log_file_handle, length, message, &written)) {
             platform_console_write("Error writing to log", LOG_LEVEL_ERROR);
         }
     }
@@ -36,7 +35,7 @@ b8 init_logger(u64* memory_requirement, void* state) {
 
     state_ptr = state;
 
-    if (!filesystem_open("console.log", FILE_MODE_WRITE, false, &state_ptr->log_file_handle)) {
+    if (!open_file("console.log", FILE_MODE_WRITE, false, &state_ptr->log_file_handle)) {
         platform_console_write("Unable to open console.log", LOG_LEVEL_ERROR);
         return false;
     }
@@ -54,7 +53,7 @@ b8 init_logger(u64* memory_requirement, void* state) {
 }
 void shutdown_logger(void* state) {
 	//TODO cleanup logging/write queued entries
-    filesystem_close(&state_ptr->log_file_handle);
+    close_file(&state_ptr->log_file_handle);
     state_ptr = 0;
 }
 void m_log(log_level level, const char* message, ...) {

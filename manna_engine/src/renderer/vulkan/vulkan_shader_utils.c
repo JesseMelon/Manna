@@ -15,7 +15,7 @@ b8 create_shader_module(vulkan_context *context, const char *name, const char *t
     shader_stages[stage_index].create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     
     file_handle handle;
-    if (!filesystem_open(file_name, FILE_MODE_READ, TRUE, &handle)) {
+    if (!open_file(file_name, FILE_MODE_READ, TRUE, &handle)) {
         LOG_ERROR("Unable to read shader module: %s.", file_name);
         return false;
     }
@@ -23,14 +23,14 @@ b8 create_shader_module(vulkan_context *context, const char *name, const char *t
     //read as binary
     u64 size = 0;
     u8* file_buffer = 0;
-    if (!filesystem_read_all_bytes(&handle, &file_buffer, &size)) {
+    if (!read_all_bytes(&handle, &file_buffer, &size)) {
         LOG_ERROR("Unable to read binary shader module: '%s'", file_name);
         return false;
     }
     shader_stages[stage_index].create_info.codeSize = size;
     shader_stages[stage_index].create_info.pCode = (u32*)file_buffer;
 
-    filesystem_close(&handle);
+    close_file(&handle);
 
     VK_CHECK(vkCreateShaderModule(context->device.logical_device, &shader_stages[stage_index].create_info, context->allocator, &shader_stages[stage_index].handle));
 

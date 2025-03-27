@@ -12,6 +12,16 @@
         (void)result;                                   \
     } while(0)
 
+typedef struct vulkan_buffer {
+    u64 total_size;
+    VkBuffer handle;
+    VkBufferUsageFlagBits usage;
+    b8 is_locked;
+    VkDeviceMemory memory;
+    i32 memory_index;
+    u32 memory_property_flags;
+} vulkan_buffer;
+
 //system swapchain capabilities
 typedef struct vulkan_swapchain_support_info {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -121,6 +131,7 @@ typedef struct vulkan_pipeline {
     VkPipelineLayout pipeline_layout;
 } vulkan_pipeline;
 
+//TODO: swap with ray tracing
 #define OBJECT_SHADER_STAGE_COUNT 2 //vert & frag
 
 typedef struct vulkan_object_shader {
@@ -143,6 +154,9 @@ typedef struct vulkan_context {
     vulkan_swapchain swapchain;
     vulkan_renderpass main_renderpass;
 
+    vulkan_buffer object_vertex_buffer;
+    vulkan_buffer object_index_buffer;
+
     //darray
     vulkan_command_buffer* graphics_command_buffers;
 
@@ -163,6 +177,8 @@ typedef struct vulkan_context {
 
     vulkan_object_shader object_shader;
 
+    u64 geometry_vertex_offset;
+    u64 geometry_index_offset;
+
     i32 (*find_memory_index)(u32 type_filter, u32 property_flags);
 } vulkan_context;
-

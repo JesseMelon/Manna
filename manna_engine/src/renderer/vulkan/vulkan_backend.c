@@ -1,6 +1,8 @@
 #include "vulkan_backend.h"
 #include "core/application.h"
+#include "math/math_types.h"
 #include "memory/memory.h"
+#include "renderer/vulkan/vulkan_buffer.h"
 #include "renderer/vulkan/vulkan_command_buffer.h"
 #include "renderer/vulkan/vulkan_fence.h"
 #include "renderer/vulkan/vulkan_utils.h"
@@ -149,6 +151,36 @@ i32 find_memory_index(u32 type_filter, u32 property_flags) {
     }
     LOG_WARN("Unable to find memory type");
     return -1;
+}
+
+static b8 create_buffers(vulkan_context* context) {
+    VkMemoryPropertyFlagBits memory_property_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+    
+    const u64 vertex_buffer_size = sizeof(vertex) * 1024 * 1024; //this is overkill?
+    if (!create_vulkan_buffer(context,
+                              vertex_buffer_size,
+                              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                              memory_property_flags,
+                              true,
+                              &context->object_vertex_buffer)) {
+        LOG_ERROR("Error creating vertex buffer");
+        return false;
+    }
+    context->geometry_vertex_offset = 0;
+
+    const u64 index_buffer_size = sizeof(u32) * 1024 * 1024;
+    if (!create_vulkan_buffer(context,
+                              index_buffer_size,
+                              VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                              memory_property_flags,
+                              true,
+                              &context->object_index_buffer)) {
+        LOG_ERROR("Error creating index buffer");
+        return false;
+    }
+    context->geometry_index_offset = 0;
+
+    return true;
 }
 
 b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *application_name) {
@@ -303,6 +335,8 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
         return false;
     }
 
+    create_buffers(&context);
+
     LOG_INFO("Vulkan renderer initialized");
     return TRUE;
 }
@@ -311,6 +345,11 @@ void shutdown_vulkan_renderer_backend(renderer_backend *backend) {
 
     //wait for device to finish up what is currently doing
     vkDeviceWaitIdle(context.device.logical_device);
+
+    destroy_vulkan_buffer(&context, &context.object_vertex_buffer);
+    destroy_vulkan_buffer(&context, &context.object_index_buffer);
+
+    destroy_vulkan_object_shader(&context, &context.object_shader);
 
     //Sync objects
     for (u8 i = 0; i < context.swapchain.max_frames_in_flight; ++i) {

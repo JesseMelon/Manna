@@ -6,12 +6,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
-b8 filesystem_exists(const char *path) {
+b8 file_exists(const char *path) {
     struct stat buffer;
     return stat(path, &buffer) == 0;
 }
 
-b8 filesystem_open(const char *path, file_modes mode, b8 binary, file_handle *out_handle) {
+b8 open_file(const char *path, file_modes mode, b8 binary, file_handle *out_handle) {
     out_handle->is_valid = FALSE;
     out_handle->handle = 0;
     const char* mode_str;
@@ -39,7 +39,7 @@ b8 filesystem_open(const char *path, file_modes mode, b8 binary, file_handle *ou
     return TRUE;
 }
 
-void filesystem_close(file_handle* handle) {
+void close_file(file_handle* handle) {
     if (handle->handle) {
         fclose((FILE*)handle->handle);
         handle->handle = 0;
@@ -47,11 +47,13 @@ void filesystem_close(file_handle* handle) {
     }
 }
 
-b8 filesystem_read_line(file_handle *handle, char **line_buf) {
+b8 read_line(file_handle *handle, char **line_buf) {
     if (handle->handle) {
         char buffer[32000]; //assumption that line wont exceed 32000 chars
         if(fgets(buffer, 32000, (FILE*)handle->handle) != 0) {
             u64 length = strlen(buffer);
+
+            //HACK: malloc every line is a sin. Must refactor
             *line_buf = m_allocate((sizeof(char) * length), MEMORY_TAG_STRING);
             strcpy(*line_buf, buffer);
             return TRUE;
@@ -60,7 +62,7 @@ b8 filesystem_read_line(file_handle *handle, char **line_buf) {
     return FALSE;
 }
 
-b8 filesystem_write_line(file_handle *handle, const char *text) {
+b8 write_line(file_handle *handle, const char *text) {
     if (handle->handle) {
         i32 result = fputs(text, (FILE*)handle->handle);
         if (result != EOF) {
@@ -73,7 +75,7 @@ b8 filesystem_write_line(file_handle *handle, const char *text) {
     return FALSE;
 }
 
-b8 filesystem_read(file_handle *handle, u64 data_size, void *out_data, u64 *out_bytes_read) {
+b8 read_from_file(file_handle *handle, u64 data_size, void *out_data, u64 *out_bytes_read) {
     if (handle->handle && out_data) {
         *out_bytes_read = fread(out_data, 1, data_size, (FILE*)handle->handle);
         if (*out_bytes_read != data_size) {
@@ -84,7 +86,7 @@ b8 filesystem_read(file_handle *handle, u64 data_size, void *out_data, u64 *out_
     return FALSE;
 }
 
-b8 filesystem_read_all_bytes(file_handle *handle, u8 **out_bytes, u64 *out_bytes_read) {
+b8 read_all_bytes(file_handle *handle, u8 **out_bytes, u64 *out_bytes_read) {
     if (handle->handle) {
         fseek((FILE*)handle->handle, 0, SEEK_END);
         u64 size = ftell((FILE*)handle->handle);
@@ -100,7 +102,7 @@ b8 filesystem_read_all_bytes(file_handle *handle, u8 **out_bytes, u64 *out_bytes
     return FALSE;
 }
 
-b8 filesystem_write(file_handle *handle, u64 data_size, const void *data, u64 *out_bytes_written) {
+b8 write_to_file(file_handle *handle, u64 data_size, const void *data, u64 *out_bytes_written) {
     if (handle->handle) {
         *out_bytes_written = fwrite(data, 1, data_size, (FILE*)handle->handle);
         if (*out_bytes_written != data_size) {

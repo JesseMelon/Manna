@@ -1,0 +1,21 @@
+#pragma once
+
+#include "vulkan_types.h"
+
+b8 create_vulkan_pipeline(
+    vulkan_context* context,
+    vulkan_renderpass* renderpass,
+    u32 attribute_count,
+    VkVertexInputAttributeDescription* attributes,
+    u32 descriptor_set_layout_count,
+    VkDescriptorSetLayout* descriptor_set_layouts,
+    u32 stage_count,
+    VkPipelineShaderStageCreateInfo* stages,
+    VkViewport viewport,
+    VkRect2D scissor,
+    b8 is_wireframe,
+    vulkan_pipeline* out_pipeline);
+
+void destroy_vulkan_pipeline(vulkan_context* context, vulkan_pipeline* pipeline);
+
+void bind_vulkan_pipeline(vulkan_command_buffer* command_buffer, VkPipelineBindPoint bind_point, vulkan_pipeline* pipeline);
