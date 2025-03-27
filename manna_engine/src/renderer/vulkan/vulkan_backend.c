@@ -365,7 +365,8 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     verts[0].position.y = -0.5;
     verts[1].position.x = 0.5;
     verts[1].position.y = 0.5;
-    verts[2].position.x = 0.5;
+    verts[2].position.x = 0;
+    verts[2].position.y = 0.5;
 
 #define TEMP_INDEX_COUNT 3
     u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2};
