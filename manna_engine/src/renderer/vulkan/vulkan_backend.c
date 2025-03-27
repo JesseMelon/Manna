@@ -140,6 +140,25 @@ b8 recreate_swapchain(renderer_backend* backend) {
     return TRUE;
 }
 
+//why the extra step? because device local memory is used in vkmemorypropertyflagbits (set in create_buffers) this is because device local memory is
+//faster than host coherent.
+//TODO: totally refactor this and move it somewhere
+void upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fence, VkQueue queue, vulkan_buffer* buffer, u64 offset, u64 size, void* data) {
+    //create host visible staging buffer to upload to. Mark as source of transfer
+    VkBufferUsageFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    vulkan_buffer staging;
+    create_vulkan_buffer(context, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, flags, true, &staging);
+
+    //load data into staging buffer
+    load_vulkan_buffer_data(context, &staging, 0, size, 0, data);
+
+    //copy from staging buffer to device local buffer
+    copy_vulkan_buffer(context, pool, fence, queue, staging.handle, 0, buffer->handle, offset, size);
+
+    //clean up staging buffer
+    destroy_vulkan_buffer(context, &staging);
+}
+
 i32 find_memory_index(u32 type_filter, u32 property_flags) {
     VkPhysicalDeviceMemoryProperties memory_properties;
     vkGetPhysicalDeviceMemoryProperties(context.device.physical_device, &memory_properties);
@@ -337,6 +356,25 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
 
     create_buffers(&context);
 
+    //HACK: Temporary test code
+#define TEMP_VERTEX_COUNT 3
+    vertex verts[TEMP_VERTEX_COUNT];
+    m_set_memory(verts, 0, sizeof(vertex) * TEMP_VERTEX_COUNT);
+
+    verts[0].position.x = 0.0;
+    verts[0].position.y = -0.5;
+    verts[1].position.x = 0.5;
+    verts[1].position.y = 0.5;
+    verts[2].position.x = 0.5;
+
+#define TEMP_INDEX_COUNT 3
+    u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2};
+
+    upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_vertex_buffer, 0, sizeof(vertex) * TEMP_VERTEX_COUNT, verts);
+    upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(vertex) * TEMP_INDEX_COUNT, indices);
+    //end of test section
+
+
     LOG_INFO("Vulkan renderer initialized");
     return TRUE;
 }
@@ -483,6 +521,21 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time
     context.main_renderpass.h = context.framebuffer_height;
 
     begin_vulkan_renderpass(command_buffer, &context.main_renderpass, context.swapchain.framebuffers[context.image_index].handle);
+
+    //HACK: temporary test code
+    //use shader
+    use_vulkan_object_shader(&context, &context.object_shader);
+
+    //bind vertex buffer at offset
+    VkDeviceSize offsets[1] = {0};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
+
+    //bind index buffer at offset
+    vkCmdBindIndexBuffer(command_buffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    //draw call
+    vkCmdDrawIndexed(command_buffer->handle, TEMP_INDEX_COUNT, 1, 0, 0, 0);
+    //end of test section
 
     return TRUE;
 }
