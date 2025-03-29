@@ -14,8 +14,10 @@ b8 create_vulkan_buffer(vulkan_context *context, u64 size, VkBufferUsageFlagBits
     buffer_info.size = size;
     buffer_info.usage = usage;
     buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //only used in one queue
-
-    VK_CHECK(vkCreateBuffer(context->device.logical_device, &buffer_info, context->allocator, &out_buffer->handle));
+    VkResult result = vkCreateBuffer(context->device.logical_device, &buffer_info, context->allocator, &out_buffer->handle);
+    if (result) {
+		LOG_ERROR("Failed to create vulkan buffer, %s", result);
+    }
 
     //get memory requirements
 
@@ -31,7 +33,7 @@ b8 create_vulkan_buffer(vulkan_context *context, u64 size, VkBufferUsageFlagBits
     allocate_info.allocationSize = requirements.size;
     allocate_info.memoryTypeIndex = (u32) out_buffer->memory_index;
 
-    VkResult result = vkAllocateMemory(context->device.logical_device, &allocate_info, context->allocator, &out_buffer->memory);
+    result = vkAllocateMemory(context->device.logical_device, &allocate_info, context->allocator, &out_buffer->memory);
     if (result != VK_SUCCESS) {
         LOG_ERROR("Unable to create vulkan buffer, memory allocation failed. Error: %i", result);
         return false;
