@@ -24,7 +24,7 @@ static u32 cached_framebuffer_width = 0;
 static u32 cached_framebuffer_height = 0;
 
 //internal logging callback function to display vulkan messages
-VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
+VKAPI_ATTR VkBool32 VKAPI_CALL static vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     VkDebugUtilsMessageTypeFlagsEXT message_types,
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
@@ -52,7 +52,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
  *
  * @param[in] backend [TODO:description]
  */
-void create_command_buffers(renderer_backend* backend) {
+static void create_command_buffers(renderer_backend* backend) {
     if (!context.graphics_command_buffers) {
         context.graphics_command_buffers = darray_reserve(vulkan_command_buffer, context.swapchain.image_count);
         for (u32 i = 0; i < context.swapchain.image_count; ++i) {
@@ -70,7 +70,7 @@ void create_command_buffers(renderer_backend* backend) {
     LOG_INFO("Vulkan command buffers created");
 }
 
-void regenerate_framebuffers(renderer_backend* backend, vulkan_swapchain* swapchain, vulkan_renderpass* renderpass) {
+void static regenerate_framebuffers(renderer_backend* backend, vulkan_swapchain* swapchain, vulkan_renderpass* renderpass) {
     for (u32 i = 0; i < swapchain->image_count; ++i) {
         //TODO: make dynamic
         u32 attachment_count = 2;
@@ -79,7 +79,7 @@ void regenerate_framebuffers(renderer_backend* backend, vulkan_swapchain* swapch
     }
 }
 
-b8 recreate_swapchain(renderer_backend* backend) {
+static b8 recreate_swapchain(renderer_backend* backend) {
     //check to see if already recreating
     if (context.recreating_swapchain) {
         LOG_DEBUG("recreating_swapchain called while already recreating");
@@ -143,7 +143,7 @@ b8 recreate_swapchain(renderer_backend* backend) {
 //why the extra step? because device local memory is used in vkmemorypropertyflagbits (set in create_buffers) this is because device local memory is
 //faster than host coherent.
 //TODO: totally refactor this and move it somewhere
-void upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fence, VkQueue queue, vulkan_buffer* buffer, u64 offset, u64 size, void* data) {
+void static upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fence, VkQueue queue, vulkan_buffer* buffer, u64 offset, u64 size, void* data) {
     LOG_DEBUG("Uploading data range");
     //create host visible staging buffer to upload to. Mark as source of transfer
     VkBufferUsageFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -160,7 +160,7 @@ void upload_data_range(vulkan_context* context, VkCommandPool pool, VkFence fenc
     destroy_vulkan_buffer(context, &staging);
 }
 
-i32 find_memory_index(u32 type_filter, u32 property_flags) {
+static i32 find_memory_index(u32 type_filter, u32 property_flags) {
     VkPhysicalDeviceMemoryProperties memory_properties;
     vkGetPhysicalDeviceMemoryProperties(context.device.physical_device, &memory_properties);
 
@@ -363,10 +363,12 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     vertex verts[TEMP_VERTEX_COUNT];
     m_set_memory(verts, 0, sizeof(vertex) * TEMP_VERTEX_COUNT);
 
-    verts[0].position = (vec3){0, -0.5, 0.0};  // Bottom-left
-    verts[1].position = (vec3){0.5, 0.5, 0.0};  // Bottom-right
-    verts[2].position = (vec3){0.0,  0.5, 0.0};  // Top
-    verts[3].position = (vec3){0.5, -0.5, 0.0};
+    verts[0].position = (vec3){.elements = {0, -0.5, 0.0}};  // Bottom-left
+    verts[1].position = (vec3){.elements = {0.5, 0.5, 0.0}};  // Bottom-right
+    verts[2].position = (vec3){.elements = {0.0,  0.5, 0.0}};  // Top
+    verts[3].position = (vec3){.elements = {0.5, -0.5, 0.0}};
+
+    
 
 #define TEMP_INDEX_COUNT 6
     u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2, 0, 3, 1};
@@ -501,19 +503,23 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time
     begin_vulkan_command_buffer(command_buffer, FALSE, FALSE, FALSE);
 
     //dynamic state, treating bottom left as 0,0 and depth from 0 to 1 consistent with opengl
-    VkViewport viewport;
-    viewport.x = 0.0f;
-    viewport.y = (f32)context.framebuffer_height;
-    viewport.width = (f32)context.framebuffer_width;
-    viewport.height = -(f32)context.framebuffer_height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    VkViewport viewport = {
+        .x = 0.0f,
+        .y = (f32)context.framebuffer_height,
+        .width = (f32)context.framebuffer_width,
+        .height = -(f32)context.framebuffer_height,
+        .minDepth = 0.0f,
+        .maxDepth = 1.0f,
+    };
+
 
     //Scissor to size of screen. could make smaller for demonstration 
-    VkRect2D scissor;
-    scissor.offset.x = scissor.offset.y = 0;
-    scissor.extent.width = context.framebuffer_width;
-    scissor.extent.height = context.framebuffer_height;
+    VkRect2D scissor = {
+        .offset.x = scissor.offset.y = 0,
+        .extent.width = context.framebuffer_width,
+        .extent.height = context.framebuffer_height,
+    };
+
 
     vkCmdSetViewport(command_buffer->handle, 0, 1, &viewport);
     vkCmdSetScissor(command_buffer->handle, 0, 1, &scissor);
@@ -535,6 +541,7 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
     context.object_shader.global_uniform_object.projection = projection;
     context.object_shader.global_uniform_object.view = view;
 
+    object_shader_update_global_ubo(&context, &context.object_shader);
     //HACK: temporary test code
     //use shader
     use_vulkan_object_shader(&context, &context.object_shader);
@@ -550,7 +557,7 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
     vkCmdDrawIndexed(command_buffer->handle, TEMP_INDEX_COUNT, 1, 0, 0, 0);
     //end of test section
     
-    object_shader_update_global_ubo(&context, &context.object_shader);
+
 }
 
 b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) {

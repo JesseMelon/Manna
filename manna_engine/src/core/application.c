@@ -162,8 +162,7 @@ b8 run_application() {
 			}
             
             //TODO: render data
-            render_data render_data;
-            render_data.delta_time = delta;
+            render_data render_data = {.delta_time = delta};
             draw_frame(&render_data);
 
             f64 frame_end_time = platform_get_time();
