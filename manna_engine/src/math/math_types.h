@@ -20,13 +20,9 @@ typedef union vec3 {
         union {
             f32 x, r, s, u;
         };
-    };
-    struct {
         union {
             f32 y, g, t, v;
         };
-    };
-    struct {
         union {
             f32 z, b, p, w;
         };

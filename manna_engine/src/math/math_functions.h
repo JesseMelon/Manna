@@ -414,6 +414,7 @@ INLINE mat4 mat4_orthographic_projection(f32 left, f32 right, f32 bottom, f32 to
     return out_matrix;
 }
 
+//column major
 INLINE mat4 mat4_perspective(f32 fov_radians, f32 aspect_ratio, f32 near_clip, f32 far_clip) {
     f32 half_tan_fov = m_tan(fov_radians * 0.5f);
     mat4 out_matrix;

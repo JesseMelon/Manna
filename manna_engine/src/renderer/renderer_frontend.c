@@ -67,7 +67,17 @@ void on_resized(u16 width, u16 height) {
 b8 draw_frame(render_data *data) {
     if (begin_frame(data->delta_time)) {
 
-        state_ptr->backend.update_global_state(mat4_identity(), mat4_identity(), vec3_zero(), vec4_one(), 0);
+        mat4 projection = mat4_perspective(deg_to_rad(45.0f), 1280 / 720.0f, 0.1f, 1000.0f);
+        static f32 z = -1.0f;
+        z -= 0.005f; 
+        vec3 pos;
+        pos.x = 0;
+        pos.y = 0;
+        pos.z = z;
+        mat4 view = mat4_translation(pos);
+        //LOG_DEBUG("%f", z);
+
+        state_ptr->backend.update_global_state(projection, view, vec3_zero(), vec4_one(), 0);
 
         b8 result = end_frame(data->delta_time);
 

@@ -363,10 +363,12 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     vertex verts[TEMP_VERTEX_COUNT];
     m_set_memory(verts, 0, sizeof(vertex) * TEMP_VERTEX_COUNT);
 
-    verts[0].position = (vec3){.elements = {0, -0.5, 0.0}};  // Bottom-left
-    verts[1].position = (vec3){.elements = {0.5, 0.5, 0.0}};  // Bottom-right
-    verts[2].position = (vec3){.elements = {0.0,  0.5, 0.0}};  // Top
-    verts[3].position = (vec3){.elements = {0.5, -0.5, 0.0}};
+    const f32 f = 10.0f;
+
+    verts[0].position = (vec3){.elements = {-1, -1, 0.0}};  // Bottom-left
+    verts[1].position = (vec3){.elements = {1, 1, 0.0}};  // Bottom-right
+    verts[2].position = (vec3){.elements = {-1, 1, 0.0}};  // Top
+    verts[3].position = (vec3){.elements = {1, -1, 0.0}};
 
     
 
