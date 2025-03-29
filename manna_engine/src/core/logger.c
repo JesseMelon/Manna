@@ -76,5 +76,5 @@ void m_log(log_level level, const char* message, ...) {
 		platform_console_write(buffer, level);
 	}
 
-    append_to_logfile(message);
+    append_to_logfile(buffer);
 }

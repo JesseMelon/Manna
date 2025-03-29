@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "core/asserts.h"
 #include <vulkan/vulkan.h>
+#include "renderer/renderer_types.h"
 #include "vulkan/vulkan_core.h"
 
 #define VK_CHECK(expression)                            \
@@ -136,6 +137,21 @@ typedef struct vulkan_pipeline {
 
 typedef struct vulkan_object_shader {
     vulkan_shader_stage stages[OBJECT_SHADER_STAGE_COUNT];
+
+    //for global descriptors such as perspective and view matrices
+    VkDescriptorPool global_descriptor_pool;
+
+    //used by descriptor pool to know the memory layout of descriptor set.
+    VkDescriptorSetLayout global_descriptor_set_layout;
+
+    //one descriptor set per frame. 3 for triple buffering
+    VkDescriptorSet global_descriptor_sets[3];
+
+    global_uniform_object global_uniform_object;
+
+    //will be attached to descriptor set and uploaded
+    vulkan_buffer global_ubo;
+
     vulkan_pipeline pipeline;
 } vulkan_object_shader;
 

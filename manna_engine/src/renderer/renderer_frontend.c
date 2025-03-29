@@ -1,3 +1,4 @@
+#include "math/math_functions.h"
 #include "renderer/renderer_types.h"
 #include "renderer_backend.h"
 #include "renderer_frontend.h"
@@ -65,6 +66,9 @@ void on_resized(u16 width, u16 height) {
 
 b8 draw_frame(render_data *data) {
     if (begin_frame(data->delta_time)) {
+
+        state_ptr->backend.update_global_state(mat4_identity(), mat4_identity(), vec3_zero(), vec4_one(), 0);
+
         b8 result = end_frame(data->delta_time);
 
         if (!result) {

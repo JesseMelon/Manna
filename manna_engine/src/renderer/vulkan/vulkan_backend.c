@@ -359,16 +359,17 @@ b8 init_vulkan_renderer_backend(renderer_backend* backend, const char *applicati
     create_buffers(&context);
 
     //HACK: Temporary test code
-#define TEMP_VERTEX_COUNT 3
+#define TEMP_VERTEX_COUNT 4
     vertex verts[TEMP_VERTEX_COUNT];
     m_set_memory(verts, 0, sizeof(vertex) * TEMP_VERTEX_COUNT);
 
-verts[0].position = (vec3){-0.5, -0.5, 0.0};  // Bottom-left
-verts[1].position = (vec3){ 0.5, -0.5, 0.0};  // Bottom-right
-verts[2].position = (vec3){ 0.0,  0.5, 0.0};  // Top
+    verts[0].position = (vec3){0, -0.5, 0.0};  // Bottom-left
+    verts[1].position = (vec3){0.5, 0.5, 0.0};  // Bottom-right
+    verts[2].position = (vec3){0.0,  0.5, 0.0};  // Top
+    verts[3].position = (vec3){0.5, -0.5, 0.0};
 
-#define TEMP_INDEX_COUNT 3
-    u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2};
+#define TEMP_INDEX_COUNT 6
+    u32 indices[TEMP_INDEX_COUNT] = {0, 1, 2, 0, 3, 1};
 
     upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_vertex_buffer, 0, sizeof(vertex) * TEMP_VERTEX_COUNT, verts);
     upload_data_range(&context, context.device.graphics_command_pool, 0, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(u32) * TEMP_INDEX_COUNT, indices);
@@ -522,6 +523,18 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time
 
     begin_vulkan_renderpass(command_buffer, &context.main_renderpass, context.swapchain.framebuffers[context.image_index].handle);
 
+    return TRUE;
+}
+
+//matrices are passed as value as to not hold up the updating of the source version while frame is in use
+void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_position, vec4 ambient_colour, i32 mode) {
+    vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
+
+    use_vulkan_object_shader(&context, &context.object_shader);
+
+    context.object_shader.global_uniform_object.projection = projection;
+    context.object_shader.global_uniform_object.view = view;
+
     //HACK: temporary test code
     //use shader
     use_vulkan_object_shader(&context, &context.object_shader);
@@ -536,8 +549,8 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time
     //draw call
     vkCmdDrawIndexed(command_buffer->handle, TEMP_INDEX_COUNT, 1, 0, 0, 0);
     //end of test section
-
-    return TRUE;
+    
+    object_shader_update_global_ubo(&context, &context.object_shader);
 }
 
 b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) {

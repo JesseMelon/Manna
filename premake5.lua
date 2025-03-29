@@ -23,7 +23,9 @@ project "manna_engine"
 
     files {
         "%{prj.name}/**.h",
-        "%{prj.name}/**.c"
+        "%{prj.name}/**.c",
+        "../assets/shaders/Builtin.ObjectShader.vert.glsl",
+        "../assets/shaders/Builtin.ObjectShader.frag.glsl"
     }
 
     includedirs {
