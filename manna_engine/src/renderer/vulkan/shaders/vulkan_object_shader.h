@@ -10,3 +10,5 @@ void destroy_vulkan_object_shader(vulkan_context* context, struct vulkan_object_
 void use_vulkan_object_shader(vulkan_context* context, struct vulkan_object_shader* shader);
 
 void object_shader_update_global_ubo(vulkan_context* context, struct vulkan_object_shader* shader);
+
+void object_shader_update_object(vulkan_context* context, mat4 model);

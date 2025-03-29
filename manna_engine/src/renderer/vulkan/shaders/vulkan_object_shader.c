@@ -183,7 +183,7 @@ void object_shader_update_global_ubo(vulkan_context *context, struct vulkan_obje
         descriptor_write.pBufferInfo = &bufferInfo;
 
         vkUpdateDescriptorSets(context->device.logical_device, 1, &descriptor_write, 0, 0);
-        shader->descriptor_updated[image_index] = true;
+        //shader->descriptor_updated[image_index] = true;
     }
 
     //bind the global descriptor set to be updated
