@@ -547,7 +547,7 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
     context.object_shader.global_uniform_object.projection = projection;
     context.object_shader.global_uniform_object.view = view;
 
-    object_shader_update_global_ubo(&context, &context.object_shader);
+    vulkan_object_shader_update_global_ubo(&context, &context.object_shader);
     //HACK: temporary test code
     //use shader
     use_vulkan_object_shader(&context, &context.object_shader);
