@@ -25,6 +25,21 @@ static u32 cached_framebuffer_height = 0;
 
 void vulkan_backend_update_object(mat4 model) {
     vulkan_object_shader_update_object(&context, &context.object_shader, model);
+    //HACK: temporary test code
+    vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
+    //use shader
+    use_vulkan_object_shader(&context, &context.object_shader);
+
+    //bind vertex buffer at offset
+    VkDeviceSize offsets[1] = {0};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
+
+    //bind index buffer at offset
+    vkCmdBindIndexBuffer(command_buffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    //draw call
+    vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
+    //end of test section
 }
 
 //internal logging callback function to display vulkan messages
@@ -548,22 +563,6 @@ void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_p
     context.object_shader.global_uniform_object.view = view;
 
     vulkan_object_shader_update_global_ubo(&context, &context.object_shader);
-    //HACK: temporary test code
-    //use shader
-    use_vulkan_object_shader(&context, &context.object_shader);
-
-    //bind vertex buffer at offset
-    VkDeviceSize offsets[1] = {0};
-    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
-
-    //bind index buffer at offset
-    vkCmdBindIndexBuffer(command_buffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-
-    //draw call
-    vkCmdDrawIndexed(command_buffer->handle, TEMP_INDEX_COUNT, 1, 0, 0, 0);
-    //end of test section
-    
-
 }
 
 b8 vulkan_renderer_backend_end_frame(renderer_backend *backend, f32 delta_time) {
