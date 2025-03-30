@@ -23,6 +23,10 @@ static vulkan_context context;
 static u32 cached_framebuffer_width = 0;
 static u32 cached_framebuffer_height = 0;
 
+void vulkan_backend_update_object(mat4 model) {
+    vulkan_object_shader_update_object(&context, &context.object_shader, model);
+}
+
 //internal logging callback function to display vulkan messages
 VKAPI_ATTR VkBool32 VKAPI_CALL static vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,

@@ -157,7 +157,7 @@ void use_vulkan_object_shader(vulkan_context *context, struct vulkan_object_shad
     bind_vulkan_pipeline(&context->graphics_command_buffers[image_index], VK_PIPELINE_BIND_POINT_GRAPHICS, &shader->pipeline);
 }
 
-void object_shader_update_global_ubo(vulkan_context *context, struct vulkan_object_shader *shader) {
+void vulkan_object_shader_update_global_ubo(vulkan_context *context, struct vulkan_object_shader *shader) {
     u32 image_index = context->image_index;
     VkCommandBuffer command_buffer = context->graphics_command_buffers[image_index].handle;
     VkDescriptorSet global_descriptor = shader->global_descriptor_sets[image_index];
@@ -188,4 +188,12 @@ void object_shader_update_global_ubo(vulkan_context *context, struct vulkan_obje
 
     //bind the global descriptor set to be updated
     vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader->pipeline.pipeline_layout, 0, 1, &global_descriptor, 0, 0);
+}
+
+//vulkan spec garantees 128 byte push constant
+void vulkan_object_shader_update_object(vulkan_context *context, struct vulkan_object_shader* shader, mat4 model) {
+    u32 image_index = context->image_index;
+    VkCommandBuffer command_buffer = context->graphics_command_buffers[image_index].handle;
+
+    vkCmdPushConstants(command_buffer, shader->pipeline.pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mat4), &model);
 }

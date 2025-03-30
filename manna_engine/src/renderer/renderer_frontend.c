@@ -77,6 +77,8 @@ b8 draw_frame(render_data *data) {
 
         state_ptr->backend.update_global_state(projection, view, vec3_zero(), vec4_one(), 0);
 
+        state_ptr->backend.update_object(mat4_translation((vec3){.elements = {0,0,0}}));
+
         b8 result = end_frame(data->delta_time);
 
         if (!result) {

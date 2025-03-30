@@ -42,9 +42,5 @@ b8 create_shader_module(vulkan_context *context, const char *name, const char *t
     //NOTE: CAN HAVE MULTIPLE ENTRY POINTS ON SAME SHADER FILE. USEFUL.
     shader_stages[stage_index].shader_stage_create_info.pName = "main";
 
-    if (file_buffer) {
-        m_free(file_buffer, sizeof(u8) * size, MEMORY_TAG_STRING);
-        file_buffer = 0;
-    }
     return true;
 }

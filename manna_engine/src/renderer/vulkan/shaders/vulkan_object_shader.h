@@ -9,6 +9,6 @@ void destroy_vulkan_object_shader(vulkan_context* context, struct vulkan_object_
 //pass shader as an arg rather than its own func?
 void use_vulkan_object_shader(vulkan_context* context, struct vulkan_object_shader* shader);
 
-void object_shader_update_global_ubo(vulkan_context* context, struct vulkan_object_shader* shader);
+void vulkan_object_shader_update_global_ubo(vulkan_context* context, struct vulkan_object_shader* shader);
 
-void object_shader_update_object(vulkan_context* context, mat4 model);
+void vulkan_object_shader_update_object(vulkan_context* context, struct vulkan_object_shader* shader, mat4 model);
