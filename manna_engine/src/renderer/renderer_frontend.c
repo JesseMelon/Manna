@@ -76,8 +76,12 @@ b8 draw_frame(render_data *data) {
         //LOG_DEBUG("%f", z);
 
         state_ptr->backend.update_global_state(projection, view, vec3_zero(), vec4_one(), 0);
-
-        state_ptr->backend.update_object(mat4_translation((vec3){.elements = {0,0,0}}));
+        
+        static f32 angle = 0.01f;
+        angle += 0.001f;
+        quat rotation = quat_from_axis_angle(vec3_forward(), 0.01f, false);
+        mat4 model = rot_matrix_from_quat(rotation, vec3_zero());
+        state_ptr->backend.update_object(model);
 
         b8 result = end_frame(data->delta_time);
 

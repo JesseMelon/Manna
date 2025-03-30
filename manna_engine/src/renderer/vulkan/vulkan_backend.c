@@ -555,8 +555,6 @@ b8 vulkan_renderer_backend_begin_frame(renderer_backend *backend, f32 delta_time
 
 //matrices are passed as value as to not hold up the updating of the source version while frame is in use
 void vulkan_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_position, vec4 ambient_colour, i32 mode) {
-    vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
-
     use_vulkan_object_shader(&context, &context.object_shader);
 
     context.object_shader.global_uniform_object.projection = projection;
