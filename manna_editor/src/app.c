@@ -1,4 +1,5 @@
 #include "app.h"
+//temporary engine source code link
 #include <core/input.h>
 #include <memory/memory.h>
 
@@ -17,12 +18,10 @@ b8 update_app(manna_app* game_instance, f32 delta_time) {
         LOG_DEBUG("Allocations: %llu (%llu this frame)", alloc_count, alloc_count - prev_alloc_count);
     }
 
-    //LOG_DEBUG("Game updated");
     return TRUE;
 }
 
 b8 render_app(manna_app* game_instance, f32 delta_time) {
-    //LOG_DEBUG("Game rendered");
     return TRUE;
 }
 
